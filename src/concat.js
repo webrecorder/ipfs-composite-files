@@ -12,6 +12,10 @@ export async function getSize(ipfs, cid) {
   // otherwise, parse to unixfs node
   let unixfs = UnixFS.unmarshal(data.value.Data);
 
+  if (unixfs.isDirectory()) {
+    throw new Error(`cid ${cid} is a directory, can only concat files`);
+  }
+
   if (unixfs.data) {
     return unixfs.data.length;
   } else {

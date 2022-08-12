@@ -4,6 +4,9 @@
   "main": "index.js",
   "type": "module",
   "license": "MIT",
+  "exports": {
+    ".": "./index.js"
+  },
   "dependencies": {
     "ipfs-core": "^0.15.4",
     "yargs": "^17.5.1"
