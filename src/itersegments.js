@@ -1,4 +1,4 @@
-import * as fs from 'node:fs/promises';
+import fsp from "fs/promises";
 
 // iterate over filehandle until maxSize or end of stream, reading no more than buffSize bytes at a time
 async function* readSegment(fh, maxSize = Number.POSITIVE_INFINITY, buffSize = 16384) {
@@ -17,17 +17,18 @@ async function* readSegment(fh, maxSize = Number.POSITIVE_INFINITY, buffSize = 1
 
 // return async iterator which itself emits async iterator that reads each segment in 16K chunks
 export async function* iterSegments(filename, offsets) {
-  const fh = await fs.open(filename);
+  const {size} = await fsp.stat(filename);
+  const fh = await fsp.open(filename);
 
   let lastOffset = 0;
 
   for (const offset of offsets) {
     const length = offset - lastOffset;
-    yield readSegment(fh, length);
+    yield [readSegment(fh, length), lastOffset, length, size];
     lastOffset = offset;
   }
 
-  yield readSegment(fh);
+  yield [readSegment(fh, size - lastOffset), lastOffset, size - lastOffset, size];
 }
 
 

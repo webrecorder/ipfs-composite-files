@@ -1,28 +1,26 @@
-import fsp from "fs/promises";
 
 import { concat } from './concat.js';
 import { iterSegments } from "./itersegments.js";
 
 
-// add file contentFilename, split into chunks as indicated by splitFile array of offsets
-export async function splitAdd(ipfs, contentFilename, splitFile) {
+// add file contentFilename, split into chunks as indicated by splitFile array of offset
+export async function* splitAdd(ipfs, contentFilename, offsets) {
   const cids = [];
+  let totalSize;
 
-  const stats = await fsp.stat(contentFilename);
-
-  const offsets = parseSplits(await fsp.readFile(splitFile, {encoding: "utf8"}));
-
-  let i = 0;
-
-  for await (const segs of iterSegments(contentFilename, offsets)) {
-    console.log(`adding through offset ${i < offsets.length ? offsets[i] : stats.size} of ${stats.size}`);
-    const res = await ipfs.add(segs);
-    cids.push(res.cid);
-    i++;
+  for await (const [segs, offset, length, totSize] of iterSegments(contentFilename, offsets)) {
+    const {cid} = await ipfs.add(segs);
+    cids.push(cid);
+    totalSize = totSize;
+    yield {cid, offset, length, totalSize};
   }
 
-  return await concat(ipfs, cids);
+  const cid = await concat(ipfs, cids);
+
+  yield {cid, offset: 0, length: totalSize, totalSize};
 }
+
+
 
 // parse splitpoints from a file, attempt to determine format (a bit experimental)
 // try to parse as following in order:
@@ -33,7 +31,7 @@ export async function splitAdd(ipfs, contentFilename, splitFile) {
 // {"offset": 20}
 // prefix data {"offset": 50}
 
-function parseSplits(splitFile) {
+export function parseSplitsFile(splitFile) {
   try {
     return JSON.parse(splitFile);
   } catch (e) {
