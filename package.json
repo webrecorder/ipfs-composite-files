@@ -1,0 +1,36 @@
+{
+  "name": "ipfs-composite-files",
+  "version": "0.1.0",
+  "main": "index.js",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "ipfs-core": "^0.15.4",
+    "yargs": "^17.5.1"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": false,
+      "commonjs": false,
+      "esm": true,
+      "es2017": true
+    },
+    "extends": [
+      "plugin:wc/recommended",
+      "plugin:lit/recommended",
+      "prettier"
+    ],
+    "rules": {
+      "no-restricted-globals": [
+        2,
+        "event",
+        "error"
+      ],
+      "no-unused-vars": "warn"
+    }
+  },
+  "prettier": {},
+  "devDependencies": {
+    "eslint": "^8.21.0"
+  }
+}
