@@ -17,7 +17,7 @@ import fsp from "fs/promises";
 function main() {
   yargs(hideBin(process.argv))
   .usage("Usage: $0 [global-options] <command> [options]")
-  .option("api")
+  .option("api", {default: "/ip4/127.0.0.1/tcp/5001"})
 
   .command("concat [cids..]", "concat multiple files into a single file, like 'cat'", (yargs) => {
     yargs.demandOption("cids")
