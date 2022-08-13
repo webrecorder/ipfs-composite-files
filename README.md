@@ -12,18 +12,20 @@ The split offsets can be loaded from a separate file.
 This use cases is particularly useful for adding WARC files to IPFS, split at WARC record boundaries:
 
 ```
-cdxj-indexer my-warc.warc.gz > my-warc.cdxj
+> cdxj-indexer my-warc.warc.gz > my-warc.cdxj
 
-node cli.js add my-warc.warc.gz my-warc.cdxj
+> node cli.js add my-warc.warc.gz my-warc.cdxj
 ...
 final cid: <CID>
 
 ```
 
-The final CID printed will point to the full WARC on IPFS, split at the offset boundaries in the CDXJ. The CID of each WARC record will be printed as well.
-This ensures a WARC is split along the record boundaries and deduplicated when added to IPFS.
+The final CID printed will point to the full WARC on IPFS, split at the offset boundaries in the CDXJ. The CID of each WARC record will be printed as well. Each WARC record has a CID on IPFS and can be deduplicated, as well as the full WARC file.
 
 ## CLI Commands
+
+By default, commands use the IPFS API on default port (5001. The) `--api` flag can be used to connect to a different API endpoint.
+
 
 ### concat
 
@@ -37,7 +39,7 @@ by creating a new tree simply linking the files together
 
 The add command 
 
-`node cli.js add <contentFilename> <splitsFilename> - add file `contentFilename` split along points listed in `splitsFilename`.
+`node cli.js add <contentFilename> <splitsFilename>` - add file `contentFilename` split along points listed in `splitsFilename`.
 
 The splitsFilename can be a CSV, JSON-lines or CDXJ files.
 
