@@ -1,13 +1,14 @@
 import { code as rawCode } from 'multiformats/codecs/raw';
 import { UnixFS } from 'ipfs-unixfs';
 
-
+// ===========================================================================
 export async function* traverse(ipfs, cid, depth = Number.POSITIVE_INFINITY, offset = 0, length = 0) {
-  if (cid.code === rawCode) {
-    yield {cid, offset, length, type: "raw"};
-  }
-
   const {value} = await ipfs.dag.get(cid);
+
+  if (cid.code === rawCode) {
+    yield {cid, offset, length: value.length, type: "raw"};
+    return;
+  }
 
   let unixfs = UnixFS.unmarshal(value.Data);
 
@@ -35,5 +36,29 @@ export async function* traverse(ipfs, cid, depth = Number.POSITIVE_INFINITY, off
 
   } else if (unixfs.data) {
     yield {cid, offset, length: unixfs.data.length, type: "unixfs"};
+  }
+}
+
+
+// ===========================================================================
+export async function* traverseDir(ipfs, cid, name = "", includeDir = false) {
+  const {value} = await ipfs.dag.get(cid);
+
+  if (cid.code === rawCode) {
+    yield {cid, size: value.length, name, mtime: 0, dir: false};
+    return;
+  }
+
+  let unixfs = UnixFS.unmarshal(value.Data);
+
+  if (!unixfs.isDirectory()) {
+    yield {cid, size: unixfs.fileSize(), name, mtime: unixfs.mtime || 0, dir: false};
+    return;
+  } else if (name && includeDir) {
+    yield {cid, size: 0, name: name + "/", mtime: unixfs.mtime || 0, dir: true};
+  }
+
+  for (const link of value.Links) {
+    yield* traverseDir(ipfs, link.Hash, name + "/" + link.Name);
   }
 }

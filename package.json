@@ -8,6 +8,7 @@
     ".": "./index.js"
   },
   "dependencies": {
+    "client-zip": "github:ikreymer/client-zip#ipfs-zip-support",
     "ipfs-core": "^0.15.4",
     "yargs": "^17.5.1"
   },

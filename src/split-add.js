@@ -3,25 +3,33 @@ import { concat } from './concat.js';
 import { iterSegments } from "./itersegments.js";
 
 
+// ===========================================================================
 // add file contentFilename, split into chunks as indicated by splitFile array of offset
 export async function* splitAdd(ipfs, contentFilename, offsets) {
   const cids = [];
+  const sizes = {};
+
   let totalSize;
+
+  offsets.sort((a, b) => a - b);
 
   for await (const [segs, offset, length, totSize] of iterSegments(contentFilename, offsets)) {
     const {cid} = await ipfs.add(segs);
     cids.push(cid);
+    sizes[cid] = length;
+
     totalSize = totSize;
+
     yield {cid, offset, length, totalSize};
   }
 
-  const cid = await concat(ipfs, cids);
+  const cid = await concat(ipfs, cids, sizes);
 
   yield {cid, offset: 0, length: totalSize, totalSize};
 }
 
 
-
+// ===========================================================================
 // parse splitpoints from a file, attempt to determine format (a bit experimental)
 // try to parse as following in order:
 // json, eg. [10, 20, 50, ...]

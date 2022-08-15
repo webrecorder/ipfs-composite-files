@@ -22,7 +22,7 @@ final cid: <CID>
 
 The final CID printed will point to the full WARC on IPFS, split at the offset boundaries in the CDXJ. The CID of each WARC record will be printed as well. Each WARC record has a CID on IPFS and can be deduplicated, as well as the full WARC file.
 
-## CLI Commands
+## CLI Commands -- Files
 
 By default, commands use the IPFS API on default port (5001. The) `--api` flag can be used to connect to a different API endpoint.
 
@@ -49,6 +49,35 @@ The splitsFilename can be a CSV, JSON-lines or CDXJ files.
 
 By default, with a depth of 1, the show-ranges command will show one layer in the IPFS DAG, outputting the direct members of a composite files.
 The a higher depth, the command will print the full tree of an IPFS file DAG.
+
+## CLI Commands -- Directories
+
+This library also includes commands for working with directories, including:
+
+### make-dir
+
+`node cli.js make-dir name1=cid1 ... nameN=cidN` - create a new directory which contains the named files with the given CIDs
+
+### add-to-dir
+
+`node cli.js add-to-dir dirCid name1=cid1 ... nameN=cidN` - add list of named files (name=cid format) to existing directory
+
+### walk-dir
+
+`node cli.js walk-dir <cid>` - walks directory recursively, printing name of each CID, name and size contained.
+
+### zip-dir
+
+`node cli.js zip-dir <cid>` - creates a ZIP containing the contents of the directory in place (see below).
+
+
+## In-place ZIP
+
+An experimental feature is creating a ZIP file by linking the existing directory with ZIP file entry metadata. The ZIP file is uncompressed and effectively reuses
+the contents of the directory, so that the ZIP is effectively deduplicated against the directory. This is possible due to the ZIP format and the data remains uncompressed,
+but may be useful for packaging.
+
+This allows for sharing data as a directory as well as a ZIP without any data duplication, and providing a ZIP for portability / export outside IPFS.
 
 
 
