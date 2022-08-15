@@ -56,11 +56,11 @@ This library also includes commands for working with directories, including:
 
 ### make-dir
 
-`node cli.js make-dir name1=cid1 ... nameN=cidN` - create a new directory which contains the named files with the given CIDs
+`node cli.js make-dir [name1=cid1] ... [nameN=cidN]` - create a new directory which contains the named files with the given CIDs
 
 ### add-to-dir
 
-`node cli.js add-to-dir dirCid name1=cid1 ... nameN=cidN` - add list of named files (name=cid format) to existing directory
+`node cli.js add-to-dir <dirCid> [name1=cid1] ... [nameN=cidN]` - add list of named files (name=cid format) to existing directory
 
 ### walk-dir
 
