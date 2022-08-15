@@ -48,7 +48,7 @@ The splitsFilename can be a CSV, JSON-lines or CDXJ files.
 `node cli.js show-ranges <CID> [depth]` - inspect a file and print ranges of file and CID that corresponds to those ranges.
 
 By default, with a depth of 1, the show-ranges command will show one layer in the IPFS DAG, outputting the direct members of a composite files.
-The a higher depth, the command will print the full tree of an IPFS file DAG.
+With a higher depth, the command will print the full tree of an IPFS file DAG.
 
 ## CLI Commands -- Directories
 
