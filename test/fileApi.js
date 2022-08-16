@@ -107,14 +107,14 @@ function computeOffsetDiffs(source, totalSize) {
 
 // ===========================================================================
 test.before(async () => {
-  ipfs = await utils.create(".test-ipfs");
+  ipfs = await utils.create(".test-file-ipfs");
 
   //const {size} = await fsp.stat("./test/data/iana.warc");
   //IANA_CDXJ_OFFSET_DIFFS = computeOffsetDiffs(IANA_CDXJ_OFFSETS, size);
 });
 
 test.after(async () => {
-  await fsp.rm(".test-ipfs", { recursive: true });
+  await fsp.rm(".test-file-ipfs", { recursive: true });
 });
 
 // ===========================================================================
