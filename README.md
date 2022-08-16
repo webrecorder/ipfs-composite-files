@@ -84,6 +84,6 @@ This allows for sharing data as a directory as well as a ZIP without any data du
 
 ## Tests
 
-Tests are located in `./test` and run with `ava`. Run `yarn ava` or npx ava` to run the suite with a js-ipfs repo.
+Tests are located in `./test` and can be run with `yarn test` or npx test`. (The tests use a temporary js-ipfs repo).
 
 

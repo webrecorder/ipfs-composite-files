@@ -1,9 +1,9 @@
-import { code as rawCode } from 'multiformats/codecs/raw';
-import { UnixFS } from 'ipfs-unixfs';
+import { code as rawCode } from "multiformats/codecs/raw";
+import { UnixFS } from "ipfs-unixfs";
 
 // ===========================================================================
 export async function getSize(ipfs, cid, allowDir = false) {
-  const {value} = await ipfs.dag.get(cid);
+  const { value } = await ipfs.dag.get(cid);
 
   // if raw, use length of value
   if (cid.code == rawCode) {
@@ -32,23 +32,26 @@ export async function concat(ipfs, cids, sizes = {}) {
     return cids[0];
   }
 
-  const node = new UnixFS({ type: 'file' });
+  const node = new UnixFS({ type: "file" });
 
-  const Links = await Promise.all(cids.map(async (cid) => {
-    const Tsize = sizes[cid] !== undefined ? sizes[cid] : await getSize(ipfs, cid);
+  const Links = await Promise.all(
+    cids.map(async (cid) => {
+      const Tsize =
+        sizes[cid] !== undefined ? sizes[cid] : await getSize(ipfs, cid);
 
-    return {
-      Name: '',
-      Hash: cid,
-      Tsize
-    }
-  }));
+      return {
+        Name: "",
+        Hash: cid,
+        Tsize,
+      };
+    })
+  );
 
   Links.map(({ Tsize }) => node.addBlockSize(Tsize));
 
   const Data = node.marshal();
 
-  return await ipfs.dag.put({Data, Links}, {storeCodec: "dag-pb"});
+  return await ipfs.dag.put({ Data, Links }, { storeCodec: "dag-pb" });
 }
 
 // ===========================================================================
@@ -56,31 +59,31 @@ async function _createDirLinks(ipfs, files) {
   const names = Object.keys(files);
   names.sort();
 
-  return await Promise.all(names.map(async (Name) => {
-    const {cid, size} = files[Name];
+  return await Promise.all(
+    names.map(async (Name) => {
+      const { cid, size } = files[Name];
 
-    const Tsize = size !== undefined ? size : await getSize(ipfs, cid, true);
+      const Tsize = size !== undefined ? size : await getSize(ipfs, cid, true);
 
-    return {
-      Name,
-      Hash: cid,
-      Tsize
-    }
-  }));
+      return {
+        Name,
+        Hash: cid,
+        Tsize,
+      };
+    })
+  );
 }
-
 
 // ===========================================================================
 export async function makeDir(ipfs, files) {
-  const node = new UnixFS({ type: 'directory' });
+  const node = new UnixFS({ type: "directory" });
 
   const Data = node.marshal();
 
   const Links = await _createDirLinks(ipfs, files);
 
-  return await ipfs.dag.put({Data, Links}, {storeCodec: "dag-pb"});
+  return await ipfs.dag.put({ Data, Links }, { storeCodec: "dag-pb" });
 }
-
 
 // ===========================================================================
 export async function addToDir(ipfs, dirCid, files) {
@@ -89,7 +92,7 @@ export async function addToDir(ipfs, dirCid, files) {
   }
 
   const data = await ipfs.dag.get(dirCid);
-  const {Data} = data.value;
+  const { Data } = data.value;
 
   let node = UnixFS.unmarshal(data.value);
 
@@ -104,8 +107,7 @@ export async function addToDir(ipfs, dirCid, files) {
   const Links = [...data.value.Links, ...newLinks];
 
   // todo: disallow duplicates
-  Links.sort((a, b) => a.Name < b.Name ? -1 : 1);
+  Links.sort((a, b) => (a.Name < b.Name ? -1 : 1));
 
-  return await ipfs.dag.put({Data, Links}, {storeCodec: "dag-pb"});
+  return await ipfs.dag.put({ Data, Links }, { storeCodec: "dag-pb" });
 }
-

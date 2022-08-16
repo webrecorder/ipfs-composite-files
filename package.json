@@ -7,6 +7,11 @@
   "exports": {
     ".": "./index.js"
   },
+  "scripts": {
+    "test": "c8 ava",
+    "lint": "eslint ./src/*.js ./test/*.js cli.js",
+    "format": "prettier --write cli.js src/*.js test/*.js"
+  },
   "dependencies": {
     "client-zip": "github:ikreymer/client-zip#ipfs-zip-support",
     "ipfs-core": "^0.15.4",
@@ -14,34 +19,29 @@
   },
   "eslintConfig": {
     "env": {
-      "browser": false,
+      "node": true,
       "commonjs": false,
-      "esm": true,
-      "es2017": true
+      "es2021": true
+    },
+    "parserOptions": {
+      "sourceType": "module"
     },
     "extends": [
-      "plugin:wc/recommended",
-      "plugin:lit/recommended",
       "prettier"
-    ],
-    "rules": {
-      "no-restricted-globals": [
-        2,
-        "event",
-        "error"
-      ],
-      "no-unused-vars": "warn"
-    }
+    ]
   },
   "prettier": {},
   "devDependencies": {
     "ava": "^4.3.1",
-    "eslint": "^8.21.0"
+    "c8": "^7.12.0",
+    "eslint": "^8.21.0",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.7.1"
   },
   "ava": {
-	"files": [
-		"test/**",
-        "!test/helpers/**"
+    "files": [
+      "test/**",
+      "!test/helpers/**"
     ],
     "serial": true
   }

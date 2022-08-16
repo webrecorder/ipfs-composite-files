@@ -6,13 +6,13 @@ const decoder = new TextDecoder();
 
 export async function create(path = ".test-ipfs") {
   if (!ipfs) {
-    ipfs = await IPFS.create({repo: path, offline: true});
+    ipfs = await IPFS.create({ repo: path, offline: true });
   }
   return ipfs;
 }
 
 export async function addString(text, opts = {}) {
-  const {cid} = await ipfs.add([encoder.encode(text)], opts);
+  const { cid } = await ipfs.add([encoder.encode(text)], opts);
   return cid;
 }
 
@@ -33,4 +33,3 @@ export async function getString(cid) {
 }
 
 export const dataDir = new URL("../data/", import.meta.url).pathname;
-

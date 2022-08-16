@@ -13,15 +13,12 @@ let ipfs;
 const outputCids = {};
 
 const IANA_CDXJ_OFFSETS = [
-  265, 2527, 57313, 63504, 66725, 171256,
-  183028, 187165, 192222, 196101, 197421,
-  200698, 209409, 216133, 220034, 365641,
-  512152, 518300, 519889
+  265, 2527, 57313, 63504, 66725, 171256, 183028, 187165, 192222, 196101,
+  197421, 200698, 209409, 216133, 220034, 365641, 512152, 518300, 519889,
 ];
 
-
 // ===========================================================================
-async function testConcat(t, opts={}, ...strings) {
+async function testConcat(t, opts = {}, ...strings) {
   const cids = [];
 
   for await (const string of strings) {
@@ -35,9 +32,8 @@ async function testConcat(t, opts={}, ...strings) {
 
   const expected = strings.join("");
 
-  t.is(expected, actual); 
+  t.is(expected, actual);
 }
-
 
 // ===========================================================================
 async function testVerifyRanges(t, concatResultName, ranges) {
@@ -46,7 +42,7 @@ async function testVerifyRanges(t, concatResultName, ranges) {
   let i = 0;
 
   for await (const chunk of traverse(ipfs, cid)) {
-    const len = typeof(ranges[i]) === "string" ? ranges[i].length : ranges[i];
+    const len = typeof ranges[i] === "string" ? ranges[i].length : ranges[i];
     t.is(chunk.length, len);
     i++;
   }
@@ -54,24 +50,34 @@ async function testVerifyRanges(t, concatResultName, ranges) {
   t.is(i, ranges.length);
 }
 
-testVerifyRanges.title = (providedTitle, concatResultName) => "verify range: " + concatResultName;
+testVerifyRanges.title = (providedTitle, concatResultName) =>
+  "verify range: " + concatResultName;
 
 // ===========================================================================
 async function parseOffsets(t, splitsFilename, expected) {
   splitsFilename = utils.dataDir + splitsFilename;
 
-  const offsets = parseSplitsFile(await fsp.readFile(splitsFilename, {encoding: "utf8"}));
+  const offsets = parseSplitsFile(
+    await fsp.readFile(splitsFilename, { encoding: "utf8" })
+  );
 
   t.deepEqual(offsets, expected);
 }
 
-
 // ===========================================================================
-async function addFile(t, contentFilename, splitsFilename, cid1String, opts = {}) {
+async function addFile(
+  t,
+  contentFilename,
+  splitsFilename,
+  cid1String,
+  opts = {}
+) {
   splitsFilename = utils.dataDir + splitsFilename;
   contentFilename = utils.dataDir + contentFilename;
 
-  const offsets = parseSplitsFile(await fsp.readFile(splitsFilename, {encoding: "utf8"}));
+  const offsets = parseSplitsFile(
+    await fsp.readFile(splitsFilename, { encoding: "utf8" })
+  );
 
   let lastEntry = null;
 
@@ -107,35 +113,66 @@ test.before(async () => {
 
   //const {size} = await fsp.stat("./test/data/iana.warc");
   //IANA_CDXJ_OFFSET_DIFFS = computeOffsetDiffs(IANA_CDXJ_OFFSETS, size);
-
 });
 
 test.after(async () => {
-  await fsp.rm(".test-ipfs", {recursive: true});
+  await fsp.rm(".test-ipfs", { recursive: true });
 });
 
-
 // ===========================================================================
-test("concat 2", testConcat, {cidVersion: 1, rawLeaves: false}, "hello world", "test data");
+test(
+  "concat 2",
+  testConcat,
+  { cidVersion: 1, rawLeaves: false },
+  "hello world",
+  "test data"
+);
 
-test("concat 2 with rawLeaves", testConcat, {rawLeaves: true}, "hello world", "test data");
+test(
+  "concat 2 with rawLeaves",
+  testConcat,
+  { rawLeaves: true },
+  "hello world",
+  "test data"
+);
 
-test("concat 3", testConcat, {cidVersion: 1, rawLeaves: false}, "hello world", "\n", "test data");
-
+test(
+  "concat 3",
+  testConcat,
+  { cidVersion: 1, rawLeaves: false },
+  "hello world",
+  "\n",
+  "test data"
+);
 
 test(testVerifyRanges, "concat 2", ["hello world", "test data"]);
 test(testVerifyRanges, "concat 2 with rawLeaves", ["hello world", "test data"]);
 test(testVerifyRanges, "concat 3", ["hello world", "\n", "test data"]);
 
-
 test("parse cdxj offsets", parseOffsets, "iana.cdxj", IANA_CDXJ_OFFSETS);
 
-test("add iana.warc split offsets", addFile, "iana.warc", "iana.cdxj", "bafybeihqptzlm43udmr2riplqtgxa4brx2thqnl7hpjsfn3rtgtjfrowya");
+test(
+  "add iana.warc split offsets",
+  addFile,
+  "iana.warc",
+  "iana.cdxj",
+  "bafybeihqptzlm43udmr2riplqtgxa4brx2thqnl7hpjsfn3rtgtjfrowya"
+);
 
-test("add iana.warc split offsets, raw, 32K blocks", addFile, "iana.warc", "iana.cdxj", "bafybeia2pcz7cmv27x7iib6qaerklhhppnx4eqmche4gins644huoq3pcu", {rawLeaves: true, chunker: "size-32768", cidVersion: 1});
+test(
+  "add iana.warc split offsets, raw, 32K blocks",
+  addFile,
+  "iana.warc",
+  "iana.cdxj",
+  "bafybeia2pcz7cmv27x7iib6qaerklhhppnx4eqmche4gins644huoq3pcu",
+  { rawLeaves: true, chunker: "size-32768", cidVersion: 1 }
+);
 
-
-test(testVerifyRanges, "add iana.warc split offsets", [
+test(
+  testVerifyRanges,
+  "add iana.warc split offsets",
+  // prettier-ignore
+  [
     265, 2262,
     54786,
     6191,   3221,
@@ -147,9 +184,14 @@ test(testVerifyRanges, "add iana.warc split offsets", [
     146511,
     6148,  1589,
     32794
-]);
- 
-test(testVerifyRanges, "add iana.warc split offsets, raw, 32K blocks", [
+]
+);
+
+test(
+  testVerifyRanges,
+  "add iana.warc split offsets, raw, 32K blocks",
+  // prettier-ignore
+  [
     265, 2262,
     32768, 22018, // 54786 split into 32K blocks
     6191,  3221,
@@ -161,6 +203,5 @@ test(testVerifyRanges, "add iana.warc split offsets, raw, 32K blocks", [
     32768, 32768, 32768, 32768, 15439, // 146511 split into 32K blocks
     6148,  1589,
     32768, 26, //32794 split into 32K blocks
-]);
-
-
+]
+);
