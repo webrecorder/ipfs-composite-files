@@ -26,6 +26,8 @@ The final CID printed will point to the full WARC on IPFS, split at the offset b
 
 By default, commands use the IPFS API on default port (5001. The) `--api` flag can be used to connect to a different API endpoint.
 
+To use a local js-ipfs repo, pass a `--repo <path>` flag instead.
+
 
 ### concat
 
@@ -79,5 +81,9 @@ but may be useful for packaging.
 
 This allows for sharing data as a directory as well as a ZIP without any data duplication, and providing a ZIP for portability / export outside IPFS.
 
+
+## Tests
+
+Tests are located in `./test` and run with `ava`. Run `yarn ava` or npx ava` to run the suite with a js-ipfs repo.
 
 

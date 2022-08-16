@@ -21,7 +21,8 @@ import fsp from "fs/promises";
 function main() {
   yargs(hideBin(process.argv))
   .usage("Usage: $0 [global-options] <command> [options]")
-  .option("api", {default: "/ip4/127.0.0.1/tcp/5001"})
+  .option("api [multiaddr or url]", {default: "/ip4/127.0.0.1/tcp/5001", describe: "If specified, connect to remote IPFS node"})
+  .option("repo [path]", {describe: "If specified, use local (js-ipfs) repo"});
 
   .command("concat [cids..]", "concat multiple files into a single file, like 'cat'", (yargs) => {
     yargs.demandOption("cids")
