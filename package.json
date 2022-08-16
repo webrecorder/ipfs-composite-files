@@ -35,6 +35,14 @@
   },
   "prettier": {},
   "devDependencies": {
+    "ava": "^4.3.1",
     "eslint": "^8.21.0"
+  },
+  "ava": {
+	"files": [
+		"test/**",
+        "!test/helpers/**"
+    ],
+    "serial": true
   }
 }

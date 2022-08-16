@@ -59,7 +59,9 @@ function main() {
 
 // ===========================================================================
 async function initIPFS(argv) {
-  if (argv.api) {
+  if (argv.repo) {
+    return await ipfsCreate({offline: true, repo: argv.repo});
+  } else if (argv.api) {
     return await ipfsClientCreate({url: argv.api});
   } else {
     return await ipfsCreate({offline: true});

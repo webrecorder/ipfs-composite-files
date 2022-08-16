@@ -5,7 +5,7 @@ import { iterSegments } from "./itersegments.js";
 
 // ===========================================================================
 // add file contentFilename, split into chunks as indicated by splitFile array of offset
-export async function* splitAdd(ipfs, contentFilename, offsets) {
+export async function* splitAdd(ipfs, contentFilename, offsets, opts = {}) {
   const cids = [];
   const sizes = {};
 
@@ -14,7 +14,7 @@ export async function* splitAdd(ipfs, contentFilename, offsets) {
   offsets.sort((a, b) => a - b);
 
   for await (const [segs, offset, length, totSize] of iterSegments(contentFilename, offsets)) {
-    const {cid} = await ipfs.add(segs);
+    const {cid} = await ipfs.add(segs, opts);
     cids.push(cid);
     sizes[cid] = length;
 
