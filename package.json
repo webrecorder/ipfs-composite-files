@@ -43,6 +43,7 @@
       "test/*",
       "!test/helpers/**"
     ],
-    "serial": true
+    "serial": true,
+    "timeout": "60s"
   }
 }
