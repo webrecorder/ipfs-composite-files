@@ -14,7 +14,7 @@ export async function getSize(ipfs, cid, allowDir = false) {
   let unixfs = UnixFS.unmarshal(value.Data);
 
   if (!allowDir && unixfs.isDirectory()) {
-    throw new Error(`cid ${cid} is a directory, can files allowed`);
+    throw new Error(`cid ${cid} is a directory, only files allowed`);
   }
 
   if (unixfs.data) {
