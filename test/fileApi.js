@@ -6,7 +6,7 @@ import * as utils from "./helpers/utils.js";
 
 import { concat } from "../src/concat.js";
 import { traverse } from "../src/traverse.js";
-import { splitAdd, parseSplitsFile } from "../src/split-add.js";
+import { splitAddWithSplitsFile, parseSplitsFile } from "../src/split-add.js";
 
 let ipfs;
 
@@ -75,22 +75,20 @@ async function addFile(
   splitsFilename = utils.dataDir + splitsFilename;
   contentFilename = utils.dataDir + contentFilename;
 
-  const offsets = parseSplitsFile(
-    await fsp.readFile(splitsFilename, { encoding: "utf8" })
+  const { cid, size } = await splitAddWithSplitsFile(
+    ipfs,
+    contentFilename,
+    splitsFilename,
+    opts
   );
 
-  let lastEntry = null;
-
-  for await (const entry of splitAdd(ipfs, contentFilename, offsets, opts)) {
-    lastEntry = entry;
-  }
-
-  const cid = lastEntry.cid;
   outputCids[t.title] = cid;
 
   t.is(cid.toString(), cid1String);
 
   const expected = await fsp.readFile(contentFilename);
+  t.is(expected.length, size);
+
   const actual = await utils.getBuffer(cid);
 
   t.is(actual.length, expected.length);

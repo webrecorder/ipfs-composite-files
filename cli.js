@@ -8,7 +8,7 @@ import { CID } from "multiformats/cid";
 
 import { concat, makeDir, addToDir } from "./src/concat.js";
 
-import { splitAdd, parseSplitsFile } from "./src/split-add.js";
+import { splitAddWithSplitsFile } from "./src/split-add.js";
 
 import { traverse, traverseDir } from "./src/traverse.js";
 
@@ -152,22 +152,16 @@ async function runAddToDir(argv) {
 async function runSplitAdd(argv) {
   const ipfs = await initIPFS(argv);
 
-  const offsets = parseSplitsFile(
-    await fsp.readFile(argv.splitFilename, { encoding: "utf8" })
+  const { cid } = await splitAddWithSplitsFile(
+    ipfs,
+    argv.contentFilename,
+    argv.splitFilename,
+    {},
+    ({ cid, offset, length, totalSize } = {}) =>
+      console.log(`added [${offset}, ${offset + length}) of ${totalSize}`)
   );
 
-  let lastEntry = null;
-
-  for await (const entry of splitAdd(ipfs, argv.contentFilename, offsets)) {
-    console.log(
-      `added [${entry.offset}, ${entry.offset + entry.length}) of ${
-        entry.totalSize
-      }`
-    );
-    lastEntry = entry;
-  }
-
-  console.log(`final composite file: ${lastEntry.cid}`);
+  console.log(cid.toV1());
 }
 
 // ===========================================================================

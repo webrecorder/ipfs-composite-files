@@ -91,20 +91,18 @@ export async function addToDir(ipfs, dirCid, files) {
     throw new Error("raw cid -- not a directory");
   }
 
-  const data = await ipfs.dag.get(dirCid);
-  const { Data } = data.value;
+  const { value } = await ipfs.dag.get(dirCid);
+  let { Data, Links } = value;
 
-  let node = UnixFS.unmarshal(data.value);
+  let node = UnixFS.unmarshal(Data);
 
   if (!node.isDirectory()) {
     throw new Error(`file cid -- not a directory`);
   }
 
-  //Data = node.marshal();
-
   const newLinks = await _createDirLinks(ipfs, files);
 
-  const Links = [...data.value.Links, ...newLinks];
+  Links = [...Links, ...newLinks];
 
   // todo: disallow duplicates
   Links.sort((a, b) => (a.Name < b.Name ? -1 : 1));

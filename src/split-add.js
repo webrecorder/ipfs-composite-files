@@ -3,8 +3,29 @@ import fsp from "fs/promises";
 import { concat } from "./concat.js";
 
 // ===========================================================================
+export async function splitAddWithSplitsFile(
+  ipfs,
+  contentFilename,
+  splitsFilename,
+  opts = {},
+  callback = null
+) {
+  const offsets = parseSplitsFile(
+    await fsp.readFile(splitsFilename, { encoding: "utf8" })
+  );
+
+  return await splitAdd(ipfs, contentFilename, offsets, opts, callback);
+}
+
+// ===========================================================================
 // add file filename, split into chunks as indicated by splitFile array of offset
-export async function* splitAdd(ipfs, filename, offsets, opts = {}) {
+export async function splitAdd(
+  ipfs,
+  filename,
+  offsets,
+  opts = {},
+  callback = null
+) {
   const cids = [];
   const sizes = {};
 
@@ -37,7 +58,9 @@ export async function* splitAdd(ipfs, filename, offsets, opts = {}) {
     const length = offsets[i] - offset;
     sizes[cid] = length;
 
-    yield { cid, offset, length, totalSize };
+    if (callback) {
+      callback({ cid, offset, length, totalSize });
+    }
 
     offset = offsets[i++];
   }
@@ -46,7 +69,7 @@ export async function* splitAdd(ipfs, filename, offsets, opts = {}) {
 
   const cid = await concat(ipfs, cids, sizes);
 
-  yield { cid, offset: 0, length: totalSize, totalSize };
+  return { cid, size: totalSize };
 }
 
 // ===========================================================================

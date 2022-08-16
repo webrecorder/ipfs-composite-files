@@ -1,0 +1,11 @@
+{
+  "path": "datapackage.json",
+  "hash": "sha256:d8e3f8aefa09dd4dd68b396d797fa985c189326ff036aa162a29d08a4c89dc13",
+  "signedData": {
+    "hash": "sha256:d8e3f8aefa09dd4dd68b396d797fa985c189326ff036aa162a29d08a4c89dc13",
+    "signature": "WdNY5AEq0cpqIPbpe5ukWohfnvnNmAfhqpph63//6seucAwSIzvD0X3HauNzxf1uLdn78jtq5KouRlKeLB22Jv37cMi28B/1kHAT3l+Rn2Zptpt/1Oy3Wf/QMukQXz1l",
+    "publicKey": "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEHNJg5tXN73u5Ktr23V2Vs4+U8N0wb1hPLvfH76cwGvnNiPwbZOmn49pGdrIjgwJvVdSpxu18cM27e/vkY8vG4sfh6/8BwG7auvG4mCv717Dd9lxy42AP+MvmowcSoksX",
+    "created": "2022-08-15T23:43:19.878Z",
+    "software": "Webrecorder ArchiveWeb.page 0.8.1, using warcio.js 1.5.1"
+  }
+}

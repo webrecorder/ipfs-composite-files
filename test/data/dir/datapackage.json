@@ -1,0 +1,28 @@
+{
+  "profile": "data-package",
+  "resources": [
+    {
+      "name": "pages.jsonl",
+      "path": "pages/pages.jsonl",
+      "hash": "sha256:b1018069d55bb786f5b71d79524a4544c5602117a062edf3d329e3468a6cdec2",
+      "bytes": 1746
+    },
+    {
+      "name": "data.warc.gz",
+      "path": "archive/data.warc.gz",
+      "hash": "sha256:6ab12e6c3e1c19940edef5c4f50bd1e75a35290639f0e559c943b4b6364713aa",
+      "bytes": 552432
+    },
+    {
+      "name": "index.cdx",
+      "path": "indexes/index.cdx",
+      "hash": "sha256:3c212f0085d9b57cde73317a30f9f5ca75d101a73ccc4f2183d4a2b43a4baad0",
+      "bytes": 7353
+    }
+  ],
+  "wacz_version": "1.1.1",
+  "title": "iana",
+  "software": "Webrecorder ArchiveWeb.page 0.8.1, using warcio.js 1.5.1",
+  "created": "2022-08-15T23:43:19.878Z",
+  "modified": "2022-08-15T23:43:37.782Z"
+}

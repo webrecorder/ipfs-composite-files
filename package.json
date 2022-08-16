@@ -40,7 +40,7 @@
   },
   "ava": {
     "files": [
-      "test/**",
+      "test/*",
       "!test/helpers/**"
     ],
     "serial": true
