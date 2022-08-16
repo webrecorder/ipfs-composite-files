@@ -254,27 +254,27 @@ test(
   "zip",
   testZipDir,
   "bafybeidsbx6l3axec76hgxpajcorcq2shb5hewasmyimohztpr6pybzrxm",
-  "bafybeig7mpqjauvx3ozzxgeelkwo6djzyhucp4ruguqjlrpvu6wpoca3wm"
+  "bafybeibendipv6yz5n6ozh6lxlrun4xshosz2lfxjzsue4pqyjq2tjank4"
 );
 
 test(
   "verify zip blocks",
   testVerifyRanges,
-  "bafybeig7mpqjauvx3ozzxgeelkwo6djzyhucp4ruguqjlrpvu6wpoca3wm",
+  "bafybeibendipv6yz5n6ozh6lxlrun4xshosz2lfxjzsue4pqyjq2tjank4",
 
   // prettier-ignore
   [
     // Zip Block Comprised of existing directory blocks
-    ["QmUwESVGCBPpJbd8Jhizg82s4vBq1cWqpkuM6FsQ4ZDtPk", 47],
+    ["QmdEkWCJdUbvvDPx64K9FvLL1CUBWhou2Y6pcbW1D41jAw", 47],
     ["bafybeihqptzlm43udmr2riplqtgxa4brx2thqnl7hpjsfn3rtgtjfrowya", 552683], // archive/iana.warc
-    ["QmZAiAq8JcKdkCcAWMN1Fqf1wggpPHX4PdqMVRMVWueSH9", 69],
+    ["QmTBTjoxoV7CbPwJvxNRs7qLgR7yfzdRkEgBDxQCtzTs7A", 69],
     ["bafkreiftimfhuhoqkjjsoa62szrjkeu57f5qbbruj2t5ilxv3azds3jjmi", 675],    // datapackage-digest.json
-    ["QmY6i3CKgmq5SAwNhLin6JpMPZegxQMP9MHzc2K2QiUwne", 62],
+    ["QmY6MrCAnhkWDu4eM2MLFecV35ybe916QEDXK3NpnpCzqJ", 62],
     ["bafkreigy4p4k56qj3vg5nczznv4x7kmfygete37qg2vbmkrj2cfezco4cm", 817],    // datapackage.json
-    ["QmcX2iEHCxYNUneDZJbS2mSEmLvJkRdxiiBsjRV8coWL4j", 63],
+    ["QmfDgn3GRQ6xy14X8Zw9CpURV25jBYp79NFZJTrRYQBGZ1", 63],
     ["bafkreibgqhyupecf3om6wrya5hp6gflzey345qrb5nl2zcipx5ru5smiey", 5866],   // indexes/iana.cdxj
-    ["QmQWbEgJ1J16ckneBbGEzpS13TrBTXhKaRFf4S1y9ETBbj", 63],
+    ["QmNUe14jLedWdcQ2chSuY79DFCNa7ujtzsAEXRqVvyJ1Za", 63],
     ["bafkreifragagtvk3w6dplny5pfjeurkeyvqccf5amlw7huzj4ndiu3g6yi", 1746],   // pages/pages.jsonl
-    ["QmPrxZA6i5roq61xvtbJp6X3MCK9XxGLdjDuoMsu5khVnt", 358],
+    ["QmUGb1y2BmLVo37SbxSR2M28bqq69tDn625xiumFqQMMWh", 358],
   ]
 );

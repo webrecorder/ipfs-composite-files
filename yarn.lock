@@ -1356,7 +1356,7 @@ cli-truncate@^3.1.0:
 
 "client-zip@github:ikreymer/client-zip#ipfs-zip-support":
   version "2.2.2"
-  resolved "https://codeload.github.com/ikreymer/client-zip/tar.gz/9709bd5c06be03cb006677b8244f9619447d7422"
+  resolved "https://codeload.github.com/ikreymer/client-zip/tar.gz/af868800d48555e71dffaeb61833ac72b53fc6a6"
 
 cliui@^7.0.2:
   version "7.0.4"
