@@ -1,31 +1,83 @@
+import fsp from "fs/promises";
 
 import { concat } from './concat.js';
-import { iterSegments } from "./itersegments.js";
 
 
 // ===========================================================================
-// add file contentFilename, split into chunks as indicated by splitFile array of offset
-export async function* splitAdd(ipfs, contentFilename, offsets, opts = {}) {
+// add file filename, split into chunks as indicated by splitFile array of offset
+export async function* splitAdd(ipfs, filename, offsets, opts = {}) {
   const cids = [];
   const sizes = {};
 
-  let totalSize;
+  const stat = await fsp.stat(filename);
+  const totalSize = stat.size;
+
+  for (let i = 0; i < offsets.length; i++) {
+    if (offsets[i] === 0) {
+      offsets[i] = totalSize;
+      break;
+    }
+  }
 
   offsets.sort((a, b) => a - b);
 
-  for await (const [segs, offset, length, totSize] of iterSegments(contentFilename, offsets)) {
+  if (offsets[offsets.length - 1] !== totalSize) {
+    offsets.push(totalSize);
+  }
+
+  const fh = await fsp.open(filename);
+
+  let i = 0;
+  let offset = 0;
+
+  for await (const segs of iterSegments(fh, offsets, 1024 * 256)) {
     const {cid} = await ipfs.add(segs, opts);
     cids.push(cid);
+
+    const length = offsets[i] - offset;
     sizes[cid] = length;
 
-    totalSize = totSize;
-
     yield {cid, offset, length, totalSize};
+
+    offset = offsets[i++];
   }
+
+  await fh.close();
 
   const cid = await concat(ipfs, cids, sizes);
 
   yield {cid, offset: 0, length: totalSize, totalSize};
+}
+
+
+// ===========================================================================
+// iterate over filehandle until maxSize or end of stream, reading no more than buffSize bytes at a time
+async function* readSegment(fh, maxSize = Number.POSITIVE_INFINITY, buffSize = 16384) {
+  while (maxSize) {
+    const length = Math.min(maxSize, buffSize);
+    const buffer = Buffer.alloc(buffSize)
+    const res = await fh.read({buffer, length});
+    if (!res.bytesRead) {
+      break;
+    }
+    yield res.buffer.slice(0, res.bytesRead);
+    maxSize -= length;
+  }
+}
+
+
+// ===========================================================================
+// return async iterator which itself emits async iterator that reads each segment in 16K chunks
+export async function* iterSegments(fh, offsets, buffSize = 16384) {
+  let lastOffset = 0;
+
+  for (const offset of offsets) {
+    const length = offset - lastOffset;
+    yield readSegment(fh, length, buffSize);
+    lastOffset = offset;
+  }
+
+  //yield readSegment(fh, Number.POSITIVE_INFINITY, buffSize);
 }
 
 

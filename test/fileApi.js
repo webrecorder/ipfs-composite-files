@@ -80,6 +80,7 @@ async function addFile(t, contentFilename, splitsFilename, opts = {}) {
   const expected = await fsp.readFile(contentFilename);
   const actual = await utils.getBuffer(cid);
 
+  t.is(actual.length, expected.length);
   t.deepEqual(actual, expected);
 }
 
