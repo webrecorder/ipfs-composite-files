@@ -58,6 +58,8 @@ testVerifyRanges.title = (providedTitle, concatResultName) => "verify range: " +
 
 // ===========================================================================
 async function parseOffsets(t, splitsFilename, expected) {
+  splitsFilename = utils.dataDir + splitsFilename;
+
   const offsets = parseSplitsFile(await fsp.readFile(splitsFilename, {encoding: "utf8"}));
 
   t.deepEqual(offsets, expected);
@@ -65,7 +67,10 @@ async function parseOffsets(t, splitsFilename, expected) {
 
 
 // ===========================================================================
-async function addFile(t, contentFilename, splitsFilename, opts = {}) {
+async function addFile(t, contentFilename, splitsFilename, cid1String, opts = {}) {
+  splitsFilename = utils.dataDir + splitsFilename;
+  contentFilename = utils.dataDir + contentFilename;
+
   const offsets = parseSplitsFile(await fsp.readFile(splitsFilename, {encoding: "utf8"}));
 
   let lastEntry = null;
@@ -76,6 +81,8 @@ async function addFile(t, contentFilename, splitsFilename, opts = {}) {
 
   const cid = lastEntry.cid;
   outputCids[t.title] = cid;
+
+  t.is(cid.toString(), cid1String);
 
   const expected = await fsp.readFile(contentFilename);
   const actual = await utils.getBuffer(cid);
@@ -121,11 +128,11 @@ test(testVerifyRanges, "concat 2 with rawLeaves", ["hello world", "test data"]);
 test(testVerifyRanges, "concat 3", ["hello world", "\n", "test data"]);
 
 
-test("parse cdxj offsets", parseOffsets, "./test/data/iana.cdxj", IANA_CDXJ_OFFSETS);
+test("parse cdxj offsets", parseOffsets, "iana.cdxj", IANA_CDXJ_OFFSETS);
 
-test("add iana.warc split offsets", addFile, "./test/data/iana.warc", "./test/data/iana.cdxj");
+test("add iana.warc split offsets", addFile, "iana.warc", "iana.cdxj", "bafybeihqptzlm43udmr2riplqtgxa4brx2thqnl7hpjsfn3rtgtjfrowya");
 
-test("add iana.warc split offsets, raw, 32K blocks", addFile, "./test/data/iana.warc", "./test/data/iana.cdxj", {rawLeaves: true, chunker: "size-32768", cidVersion: 1});
+test("add iana.warc split offsets, raw, 32K blocks", addFile, "iana.warc", "iana.cdxj", "bafybeia2pcz7cmv27x7iib6qaerklhhppnx4eqmche4gins644huoq3pcu", {rawLeaves: true, chunker: "size-32768", cidVersion: 1});
 
 
 test(testVerifyRanges, "add iana.warc split offsets", [

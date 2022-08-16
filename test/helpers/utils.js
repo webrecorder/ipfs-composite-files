@@ -32,3 +32,5 @@ export async function getString(cid) {
   return decoder.decode(await getBuffer(cid));
 }
 
+export const dataDir = new URL("../data/", import.meta.url).pathname;
+

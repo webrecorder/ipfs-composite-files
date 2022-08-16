@@ -21,6 +21,7 @@ export async function* splitAdd(ipfs, filename, offsets, opts = {}) {
 
   offsets.sort((a, b) => a - b);
 
+  // last offset is the total length
   if (offsets[offsets.length - 1] !== totalSize) {
     offsets.push(totalSize);
   }

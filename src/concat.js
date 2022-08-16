@@ -28,6 +28,10 @@ export async function getSize(ipfs, cid, allowDir = false) {
 
 // ===========================================================================
 export async function concat(ipfs, cids, sizes = {}) {
+  if (cids.length === 1) {
+    return cids[0];
+  }
+
   const node = new UnixFS({ type: 'file' });
 
   const Links = await Promise.all(cids.map(async (cid) => {
@@ -46,7 +50,6 @@ export async function concat(ipfs, cids, sizes = {}) {
 
   return await ipfs.dag.put({Data, Links}, {storeCodec: "dag-pb"});
 }
-
 
 // ===========================================================================
 async function _createDirLinks(ipfs, files) {
