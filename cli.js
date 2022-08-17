@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
@@ -17,7 +19,7 @@ import { createZip } from "./src/zip.js";
 import fsp from "fs/promises";
 
 // ===========================================================================
-function main() {
+export function main() {
   yargs(hideBin(process.argv))
     .usage("Usage: $0 [global-options] <command> [options]")
     .option("api", {

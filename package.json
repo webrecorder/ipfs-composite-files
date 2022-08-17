@@ -7,6 +7,9 @@
   "exports": {
     ".": "./index.js"
   },
+  "bin": {
+    "ipfs-composite-files": "./cli.js"
+  },
   "scripts": {
     "test": "c8 ava",
     "lint": "eslint ./src/*.js ./test/*.js cli.js",
