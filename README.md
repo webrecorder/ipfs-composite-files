@@ -88,11 +88,40 @@ This library also includes commands for working with directories, including:
 
 ## In-place ZIP
 
-An experimental feature is creating a ZIP file by linking the existing directory with ZIP file entry metadata. The ZIP file is uncompressed and effectively reuses
-the contents of the directory, so that the ZIP is effectively deduplicated against the directory. This is possible due to the ZIP format and the data remains uncompressed,
-but may be useful for packaging.
+An experimental feature is creating a ZIP file by concatenating the files in an existing directory with ZIP file entry metadata. The ZIP file is uncompressed and reuses the contents of the directory, so that the ZIP is effectively deduplicated against the directory. 
 
-This allows for sharing data as a directory as well as a ZIP without any data duplication, and providing a ZIP for portability / export outside IPFS.
+This is possible due to the properties of the ZIP format, including support for uncompressed data, and can be useful for distributing
+data as ZIP for portability (eg. WACZ format) / export outside of IPFS but keeping the data separate for deduplication.
+
+
+For example, given a directory structure that with 3 files, stored under a CID A, CID B, CID C:
+
+```
+     CID DIR
+CID A: ├── afile.txt
+       ├── sample-dir  
+CID B: │   └── data.bin
+CID C: ├── somefile.txt
+```
+
+A ZIP file can reuse this data by concatenating each file with the ZIP entries created by the zipping process.
+A final ZIP file may consist of:
+```
+CID Z
+  ├── CID Z0
+  ├── CID A.   afile.txt
+  ├── CID Z1
+  ├── CID B    sample-dir/data.bin
+  ├── CID Z2
+  ├── CID C    somefile.txt
+  ├── CID Z3
+```
+
+The `ipfs-composite-files zip-dir <CID DIR>` would create and add to IPFS cids `CID Z0...Z3` and output `CID Z`.
+
+The end result is that `cat <CID Z> == cat <CID Z0> <CID A> <CID Z1> <CID B> <CID Z2> <CID C> <CID Z3>`.
+
+See the tests in [test/dirApi.js](test/dirApi.js) for a specific example.
 
 
 ## Tests
