@@ -94,7 +94,7 @@ This is possible due to the properties of the ZIP format, including support for 
 data as ZIP for portability (eg. WACZ format) / export outside of IPFS but keeping the data separate for deduplication.
 
 
-For example, given a directory structure that with 3 files, stored under a CID A, CID B, CID C:
+For example, given a directory structure with 3 files, stored under a CID A, CID B, CID C:
 
 ```
      CID DIR
@@ -109,7 +109,7 @@ A final ZIP file may consist of:
 ```
 CID Z
   ├── CID Z0
-  ├── CID A.   afile.txt
+  ├── CID A    afile.txt
   ├── CID Z1
   ├── CID B    sample-dir/data.bin
   ├── CID Z2
