@@ -1,7 +1,7 @@
 ## IPFS Composite File Utilities
 
 This repo provides several cli/api utilities for js-ipfs to create and work with composite files, files created
-by concatenating smaller files which are still referenced on IPFS.
+by concatenating smaller files which are previous already add to IPFS.
 
 Install with `npm i -g ipfs-composite-files`. This will add a global `ipfs-composite-files` command.
 
