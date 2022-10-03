@@ -12,7 +12,7 @@ import { concat, makeDir, addToDir } from "./src/concat.js";
 
 import { splitAddWithSplitsFile } from "./src/split-add.js";
 
-import { traverse, traverseDir } from "./src/traverse.js";
+import { traverse, traverseDir, getStat } from "./src/traverse.js";
 
 import { createZip } from "./src/zip.js";
 
@@ -88,6 +88,13 @@ export function main() {
       "Create a ZIP file of existing directory (uncompressed), reusing the directory data",
       () => {},
       runZipDir
+    )
+
+    .command(
+      "stat <cidpath>",
+      "Get stats of a root CID or path string. Can be <cid> or <cid>/path/to/file",
+      () => {},
+      runStat
     )
 
     .demandCommand(1).argv;
@@ -188,7 +195,20 @@ async function runWalkDir(argv) {
   const cid = CID.parse(argv.cid);
 
   for await (const entry of traverseDir(ipfs, cid)) {
-    console.log(`${entry.cid.toV1()}: ${entry.name} - ${entry.size}`);
+    console.log(`${entry.cid.toV1()}: "${entry.name}" - ${entry.size}`);
+  }
+}
+
+// ===========================================================================
+async function runStat(argv) {
+  const ipfs = await initIPFS(argv);
+
+  const entry = await getStat(ipfs, argv.cidpath);
+
+  if (entry) {
+    console.log(`${entry.cid.toV1()}: "${entry.name}" - ${entry.size}`);
+  } else {
+    console.log("Not Found!");
   }
 }
 
