@@ -7,7 +7,7 @@ import * as utils from "./helpers/utils.js";
 import { CID } from "multiformats/cid";
 import { makeDir, addToDir } from "../src/concat.js";
 import { traverse, traverseDir } from "../src/traverse.js";
-import { splitAddWithSplitsFile, parseSplitsFile } from "../src/split-add.js";
+import { splitAddWithSplitsFile, parseSplitsFile } from "../split-add.js";
 import { createZip } from "../src/zip.js";
 
 let ipfs;

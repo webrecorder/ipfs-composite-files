@@ -1,6 +1,6 @@
 import fsp from "fs/promises";
 
-import { concat } from "./concat.js";
+import { concat } from "./src/concat.js";
 
 // ===========================================================================
 export async function splitAddWithSplitsFile(

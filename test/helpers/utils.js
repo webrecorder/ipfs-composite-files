@@ -15,7 +15,8 @@ export async function create() {
 }
 
 export async function addString(text, opts = {}) {
-  const { cid } = await ipfs.add([encoder.encode(text)], opts);
+  const { cid } = await ipfs.add(text, opts);
+  //const { cid } = await ipfs.add([encoder.encode(text)], opts);
   return cid;
 }
 

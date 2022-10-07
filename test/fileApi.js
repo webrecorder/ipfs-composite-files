@@ -6,7 +6,7 @@ import * as utils from "./helpers/utils.js";
 
 import { concat } from "../src/concat.js";
 import { traverse } from "../src/traverse.js";
-import { splitAddWithSplitsFile, parseSplitsFile } from "../src/split-add.js";
+import { splitAddWithSplitsFile, parseSplitsFile } from "../split-add.js";
 
 let ipfs;
 

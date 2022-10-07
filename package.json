@@ -5,7 +5,7 @@
   "type": "module",
   "license": "MIT",
   "exports": {
-    ".": "./index.js"
+    ".": "./src/index.js"
   },
   "bin": {
     "ipfs-composite-files": "./cli.js"
@@ -13,7 +13,9 @@
   "scripts": {
     "test": "c8 ava",
     "lint": "eslint ./src/*.js ./test/*.js cli.js",
-    "format": "prettier --write cli.js src/*.js test/*.js"
+    "format": "prettier --write cli.js src/*.js test/*.js",
+    "build": "webpack --mode production",
+    "build-dev": "webpack --mode development"
   },
   "dependencies": {
     "client-zip": "github:ikreymer/client-zip#ipfs-zip-support",
@@ -39,7 +41,9 @@
     "c8": "^7.12.0",
     "eslint": "^8.21.0",
     "eslint-config-prettier": "^8.5.0",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
   },
   "ava": {
     "files": [
