@@ -47,7 +47,8 @@ export async function createInMemoryRepo() {
     repo,
     init: {
       emptyRepo: true,
-      privateKey: "CAESQEQh005HaHeDzbnAkjryrcNJSkUakq/yx6HTIS6OpgATcwTxOtfrp2I6clTqVdDMMTRC9JUua/xUp+ZmGDd8EVo=",
+      privateKey:
+        "CAESQEQh005HaHeDzbnAkjryrcNJSkUakq/yx6HTIS6OpgATcwTxOtfrp2I6clTqVdDMMTRC9JUua/xUp+ZmGDd8EVo=",
     },
 
     offline: true,

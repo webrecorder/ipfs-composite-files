@@ -3,7 +3,7 @@ export default {
     library: {
       name: "ipfs_composite",
       type: "self",
-    }
+    },
   },
   resolve: {fallback: { "util": false } }
 };
