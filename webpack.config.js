@@ -1,9 +1,10 @@
 export default {
   output: {
     library: {
-      name: "ipfs_composite",
+      name: "ipfsCompositeFiles",
       type: "self",
     },
+    filename: "ipfsCompositeFiles.js"
   },
   resolve: {fallback: { "util": false } }
 };

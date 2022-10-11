@@ -121,9 +121,40 @@ The `ipfs-composite-files zip-dir <CID DIR>` would create and add to IPFS cids `
 
 The end result is that `cat <CID Z> == cat <CID Z0> <CID A> <CID Z1> <CID B> <CID Z2> <CID C> <CID Z3>`.
 
-See the tests in [test/dirApi.js](test/dirApi.js) for a specific example.
+See the tests in [test/fileDirApi.js](test/fileDirApi.js) for a specific example.
 
 
+## API
+
+ipfs-composite-files can also be used as an API, including in the browser. Use ``npm build`` to build a browser-compatible version of the library.
+
+The built file, `./dist/ipfsCompositeFiles.js`, can then be loaded directly in the browser. Note that the `ipfs-core` library
+must also be loaded, and is not packaged with this build.
+
+The library exports all the functions as listed in [src/index.js](src/index.js) via the `self.ipfsCompositeFiles` global.
+
+An example usage in the browser, along with `ipfs-core`:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/ipfs-core/dist/index.min.js"></script>
+<script src="./dist/ipfsCompositeFiles.js"></script>
+<script>
+
+async function main() {
+  const ipfs = await self.IpfsCore.create(await self.ipfsCompositeFiles.createInMemoryRepo());
+
+  const A = await ipfs.add("abc");
+
+  const B = await ipfs.add("def");
+
+  const C = await self.ipfsCompositeFiles.concat(ipfs, [A.cid, B.cid]);
+
+  for await (const chunk of ipfs.cat(C)) {
+    console.log(chunk);
+  }
+}
+```
+ 
 ## Tests
 
 Tests are located in `./test` and can be run with `npm test`. (The tests use a temporary js-ipfs repo).
