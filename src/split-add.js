@@ -1,36 +1,16 @@
-import fsp from "fs/promises";
-
 import { concat } from "./concat.js";
 
 // ===========================================================================
-export async function splitAddWithSplitsFile(
-  ipfs,
-  contentFilename,
-  splitsFilename,
-  opts = {},
-  callback = null
-) {
-  const offsets = parseSplitsFile(
-    await fsp.readFile(splitsFilename, { encoding: "utf8" })
-  );
-
-  return await splitAdd(ipfs, contentFilename, offsets, opts, callback);
-}
-
-// ===========================================================================
-// add file filename, split into chunks as indicated by splitFile array of offset
 export async function splitAdd(
   ipfs,
-  filename,
+  stream,
+  totalSize,
   offsets,
   opts = {},
   callback = null
 ) {
   const cids = [];
   const sizes = {};
-
-  const stat = await fsp.stat(filename);
-  const totalSize = stat.size;
 
   for (let i = 0; i < offsets.length; i++) {
     if (offsets[i] === 0) {
@@ -46,13 +26,13 @@ export async function splitAdd(
     offsets.push(totalSize);
   }
 
-  const fh = await fsp.open(filename);
+  const fh = new FixedSizeIter(stream);
 
   let i = 0;
   let offset = 0;
 
   for await (const segs of iterSegments(fh, offsets, 1024 * 256)) {
-    const { cid } = await ipfs.add(segs, opts);
+    const { cid, size } = await ipfs.add(segs, opts);
     cids.push(cid);
 
     const length = offsets[i] - offset;
@@ -65,11 +45,78 @@ export async function splitAdd(
     offset = offsets[i++];
   }
 
-  await fh.close();
-
   const cid = await concat(ipfs, cids, sizes);
 
   return { cid, size: totalSize };
+}
+
+// ===========================================================================
+// todo: use existing impl of this?
+// adapted from warcio
+class FixedSizeIter {
+  constructor(stream) {
+    this.reader = stream.getReader();
+    this.prevChunk = null;
+  }
+
+  async readNext(sizeLimit = -1) {
+    const chunks = [];
+    let size = 0;
+    let chunk;
+
+    while (true) {
+      if (this.prevChunk) {
+        chunk = this.prevChunk;
+        this.prevChunk = null;
+      } else {
+        const { done, value } = await this.reader.read();
+        if (done) {
+          break;
+        }
+        chunk = value;
+      }
+
+      if (sizeLimit >= 0) {
+        if (chunk.length > sizeLimit) {
+          const [first, remainder] = [
+            chunk.slice(0, sizeLimit),
+            chunk.slice(sizeLimit),
+          ];
+          chunks.push(first);
+          size += first.byteLength;
+          this.prevChunk = remainder;
+          break;
+        } else if (chunk.length === sizeLimit) {
+          chunks.push(chunk);
+          size += chunk.byteLength;
+          sizeLimit = 0;
+          break;
+        } else {
+          sizeLimit -= chunk.length;
+        }
+      }
+      chunks.push(chunk);
+      size += chunk.byteLength;
+    }
+
+    return this.mergeChunks(chunks, size);
+  }
+
+  mergeChunks(chunks, size) {
+    if (chunks.length === 1) {
+      return chunks[0];
+    }
+    const buffer = new Uint8Array(size);
+
+    let offset = 0;
+
+    for (const chunk of chunks) {
+      buffer.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+
+    return buffer;
+  }
 }
 
 // ===========================================================================
@@ -81,12 +128,11 @@ async function* readSegment(
 ) {
   while (maxSize) {
     const length = Math.min(maxSize, buffSize);
-    const buffer = Buffer.alloc(buffSize);
-    const res = await fh.read({ buffer, length });
-    if (!res.bytesRead) {
+    const res = await fh.readNext(length);
+    if (!res || !res.length) {
       break;
     }
-    yield res.buffer.slice(0, res.bytesRead);
+    yield res;
     maxSize -= length;
   }
 }
@@ -115,12 +161,12 @@ export async function* iterSegments(fh, offsets, buffSize = 16384) {
 // {"offset": 20}
 // prefix data {"offset": 50}
 
-export function parseSplitsFile(splitFile) {
+export function parseSplits(splitText) {
   try {
-    return JSON.parse(splitFile);
+    return JSON.parse(splitText);
   } catch (e) {}
 
-  const lines = splitFile.trim().split("\n");
+  const lines = splitText.trim().split("\n");
 
   // single line, but not json, treat as csv
   if (lines.length === 0) {

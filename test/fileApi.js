@@ -6,7 +6,8 @@ import * as utils from "./helpers/utils.js";
 
 import { concat } from "../src/concat.js";
 import { traverse } from "../src/traverse.js";
-import { splitAddWithSplitsFile, parseSplitsFile } from "../src/split-add.js";
+import { splitAddWithSplitsFile } from "../cli-utils.js";
+import { parseSplits } from "../src/split-add.js";
 
 let ipfs;
 
@@ -57,7 +58,7 @@ testVerifyRanges.title = (providedTitle, concatResultName) =>
 async function parseOffsets(t, splitsFilename, expected) {
   splitsFilename = utils.dataDir + splitsFilename;
 
-  const offsets = parseSplitsFile(
+  const offsets = parseSplits(
     await fsp.readFile(splitsFilename, { encoding: "utf8" })
   );
 

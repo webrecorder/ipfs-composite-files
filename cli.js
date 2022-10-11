@@ -10,7 +10,7 @@ import { CID } from "multiformats/cid";
 
 import { concat, makeDir, addToDir } from "./src/concat.js";
 
-import { splitAddWithSplitsFile } from "./src/split-add.js";
+import { splitAddWithSplitsFile } from "./cli-utils.js";
 
 import { traverse, traverseDir } from "./src/traverse.js";
 
