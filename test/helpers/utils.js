@@ -1,12 +1,15 @@
 import * as IPFS from "ipfs-core";
 
+import { createInMemoryRepo } from "../../src/inmemrepo.js";
+
 let ipfs;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
-export async function create(path = ".test-ipfs") {
+export async function create() {
   if (!ipfs) {
-    ipfs = await IPFS.create({ repo: path, offline: true });
+    //ipfs = await IPFS.create({ repo, offline: true });
+    ipfs = await IPFS.create(await createInMemoryRepo());
   }
   return ipfs;
 }

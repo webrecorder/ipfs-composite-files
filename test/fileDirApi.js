@@ -13,12 +13,9 @@ import { createZip } from "../src/zip.js";
 let ipfs;
 
 // ===========================================================================
+
 test.before(async () => {
   ipfs = await utils.create(".test-ipfs-dir");
-});
-
-test.after(async () => {
-  await fsp.rm(".test-ipfs-dir", { recursive: true });
 });
 
 async function addFileSplit(t, contentFilename, splitsFilename, expected) {

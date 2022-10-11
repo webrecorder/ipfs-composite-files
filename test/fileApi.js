@@ -96,25 +96,9 @@ async function addFile(
 }
 
 // ===========================================================================
-function computeOffsetDiffs(source, totalSize) {
-  let diffs = [];
-  for (let i = 1; i < source.length; i++) {
-    diffs.push(source[i] - source[i - 1]);
-  }
-  diffs.push(totalSize - source[source.length - 1]);
-  return diffs;
-}
 
-// ===========================================================================
 test.before(async () => {
   ipfs = await utils.create(".test-file-ipfs");
-
-  //const {size} = await fsp.stat("./test/data/iana.warc");
-  //IANA_CDXJ_OFFSET_DIFFS = computeOffsetDiffs(IANA_CDXJ_OFFSETS, size);
-});
-
-test.after(async () => {
-  await fsp.rm(".test-file-ipfs", { recursive: true });
 });
 
 // ===========================================================================
