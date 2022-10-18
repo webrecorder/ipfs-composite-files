@@ -6,12 +6,13 @@ import * as utils from "./helpers/utils.js";
 
 import { CID } from "multiformats/cid";
 import { makeDir, addToDir } from "../src/concat.js";
-import { traverse, traverseDir } from "../src/traverse.js";
+import { traverse, traverseDir, getStat } from "../src/traverse.js";
 import { splitAddWithSplitsFile } from "../cli-utils.js";
 import { parseSplits } from "../src/split-add.js";
 import { createZip } from "../src/zip.js";
 
 let ipfs;
+
 
 // ===========================================================================
 
@@ -108,6 +109,13 @@ async function testAddToDir(t, cid, files, expected) {
   cid = await addToDir(ipfs, cid, files);
 
   t.is(cid.toString(), expected);
+}
+
+async function testFileSize(t, cidpath, expected) {
+  const entry = await getStat(ipfs, cidpath);
+  const size = entry && entry.size;
+
+  t.is(size, expected);
 }
 
 async function testVerifyRanges(t, cid, ranges) {
@@ -247,6 +255,21 @@ test(
     },
   ]
 );
+
+test(
+  "size file in dir",
+  testFileSize,
+  "bafybeidsbx6l3axec76hgxpajcorcq2shb5hewasmyimohztpr6pybzrxm/archive/iana.warc",
+  552683
+);
+
+test(
+  "size file direct",
+  testFileSize,
+  "bafybeihqptzlm43udmr2riplqtgxa4brx2thqnl7hpjsfn3rtgtjfrowya",
+  552683
+);
+
 
 test(
   "zip",

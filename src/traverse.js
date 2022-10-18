@@ -1,6 +1,9 @@
 import { code as rawCode } from "multiformats/codecs/raw";
 import { UnixFS } from "ipfs-unixfs";
 
+import { CID } from "multiformats/cid";
+
+
 // ===========================================================================
 export async function* traverse(
   ipfs,
@@ -86,5 +89,20 @@ export async function* traverseDir(ipfs, cid, name = "", includeDir = false) {
 
   for (const link of value.Links) {
     yield* traverseDir(ipfs, link.Hash, name + "/" + link.Name);
+  }
+}
+
+// ===========================================================================
+export async function getStat(ipfs, cidpath) {
+  const parts = cidpath.split("/");
+
+  const path = parts.length > 1 ? "/" + parts.slice(1).join("/") : "";
+
+  const cid = CID.parse(parts[0]);
+
+  for await (const entry of traverseDir(ipfs, cid)) {
+    if (entry.name === path) {
+      return entry;
+    }
   }
 }
