@@ -1,5 +1,6 @@
 import { code as rawCode } from "multiformats/codecs/raw";
 import { UnixFS } from "ipfs-unixfs";
+import * as dagPb from "@ipld/dag-pb";
 
 import { CID } from "multiformats/cid";
 
@@ -12,14 +13,16 @@ export async function* traverse(
   offset = 0,
   length = 0
 ) {
-  const { value } = await ipfs.dag.get(cid);
+  const block = await ipfs.blockGet(cid);
 
   if (cid.code === rawCode) {
-    yield { cid, offset, length: value.length, type: "raw" };
+    yield { cid, offset, length: block.length, type: "raw" };
     return;
   }
 
-  let unixfs = UnixFS.unmarshal(value.Data);
+  const { Data, Links } = dagPb.decode(block);
+
+  let unixfs = UnixFS.unmarshal(Data);
 
   if (unixfs.isDirectory()) {
     throw new Error("this operation is supported only for files");
@@ -32,7 +35,7 @@ export async function* traverse(
       for (let i = 0; i < unixfs.blockSizes.length; i++) {
         yield* traverse(
           ipfs,
-          value.Links[i].Hash,
+          Links[i].Hash,
           depth - 1,
           offset,
           unixfs.blockSizes[i]
@@ -59,14 +62,16 @@ export async function* traverse(
 
 // ===========================================================================
 export async function* traverseDir(ipfs, cid, name = "", includeDir = false) {
-  const { value } = await ipfs.dag.get(cid);
+  const block = await ipfs.blockGet(cid);
 
   if (cid.code === rawCode) {
-    yield { cid, size: value.length, name, mtime: 0, dir: false };
+    yield { cid, size: block.length, name, mtime: 0, dir: false };
     return;
   }
 
-  let unixfs = UnixFS.unmarshal(value.Data);
+  const { Data, Links } = dagPb.decode(block);
+
+  let unixfs = UnixFS.unmarshal(Data);
 
   if (!unixfs.isDirectory()) {
     yield {
@@ -87,7 +92,7 @@ export async function* traverseDir(ipfs, cid, name = "", includeDir = false) {
     };
   }
 
-  for (const link of value.Links) {
+  for (const link of Links) {
     yield* traverseDir(ipfs, link.Hash, name + "/" + link.Name);
   }
 }

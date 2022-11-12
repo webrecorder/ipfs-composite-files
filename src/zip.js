@@ -14,7 +14,7 @@ async function* iterDirForZip(ipfs, cid) {
   for await (const entry of traverseDir(ipfs, cid)) {
     const file = {
       bytes: {
-        iter: ipfs.cat(entry.cid),
+        iter: ipfs.catFile(entry.cid),
         id: entry.cid,
       },
       modDate: new Date(entry.mtime),
@@ -35,7 +35,7 @@ export async function createZip(ipfs, cid) {
 
   const addBuffers = async () => {
     if (buff.length) {
-      const { cid } = await ipfs.add(buff);
+      const { cid } = await ipfs.addFile(buff);
       cids.push(cid);
       sizes[cid] = buff.reduce((sum, x) => sum + x.length, 0);
       buff = [];

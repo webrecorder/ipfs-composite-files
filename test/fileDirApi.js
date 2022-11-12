@@ -34,8 +34,8 @@ async function addFileSplit(t, contentFilename, splitsFilename, expected) {
 }
 
 async function addFile(t, filename, opts, expected) {
-  const { cid } = await ipfs.add(
-    await fsp.readFile(utils.dataDir + filename),
+  const { cid } = await ipfs.addFile(
+    [await fsp.readFile(utils.dataDir + filename)],
     opts
   );
 
@@ -82,9 +82,10 @@ async function addDir(t, dirPath, expected) {
 
   let cid;
 
-  for await (const entry of ipfs.addAll(files, {
+  for await (const entry of ipfs.addAllFiles(files, {
     wrapWithDirectory: true,
     cidVersion: 1,
+    rawLeaves: true,
   })) {
     cid = entry.cid;
   }
@@ -144,7 +145,7 @@ test(
   "add cdx",
   addFile,
   "iana.cdxj",
-  { cidVersion: 1 },
+  {cidVersion: 1, rawLeaves: true},
   "bafkreibgqhyupecf3om6wrya5hp6gflzey345qrb5nl2zcipx5ru5smiey"
 );
 
