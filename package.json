@@ -18,13 +18,13 @@
     "build-dev": "webpack --mode development"
   },
   "dependencies": {
-    "@ipld/dag-pb": "2.1.18",
+    "@ipld/dag-pb": "^3.0.0",
     "blockstore-core": "^2.0.2",
     "client-zip": "github:ikreymer/client-zip#ipfs-zip-support",
     "ipfs-unixfs": "^8.0.0",
-    "ipfs-unixfs-exporter": "^7.0.11",
+    "ipfs-unixfs-exporter": "8.0.5",
     "ipfs-unixfs-importer": "^11.0.1",
-    "multiformats": "^9.9.0",
+    "multiformats": "^10.0.2",
     "yargs": "^17.5.1"
   },
   "eslintConfig": {
