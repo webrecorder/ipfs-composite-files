@@ -5,6 +5,7 @@ import { hideBin } from "yargs/helpers";
 
 import { create as ipfsClientCreate } from "ipfs-http-client";
 import { create as ipfsCreate } from "ipfs-core";
+import { RealIPFSStore } from "./src/store.js";
 
 import { CID } from "multiformats/cid";
 
@@ -102,13 +103,17 @@ export function main() {
 
 // ===========================================================================
 async function initIPFS(argv) {
+  let ipfs;
+
   if (argv.repo) {
-    return await ipfsCreate({ offline: true, repo: argv.repo });
+    ipfs = await ipfsCreate({ offline: true, repo: argv.repo });
   } else if (argv.api) {
-    return await ipfsClientCreate({ url: argv.api });
+    ipfs = await ipfsClientCreate({ url: argv.api });
   } else {
-    return await ipfsCreate({ offline: true });
+    ipfs = await ipfsCreate({ offline: true });
   }
+
+  return new RealIPFSStore(ipfs);
 }
 
 // ===========================================================================

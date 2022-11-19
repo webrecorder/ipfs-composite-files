@@ -8,7 +8,8 @@ import { sha256 } from 'multiformats/hashes/sha2';
 import * as dagPB from '@ipld/dag-pb';
 
 
-export class BlockFS
+// ===========================================================================
+export class MemoryStore
 {
   constructor() {
     this.store = new MemoryBlockstore();
@@ -60,6 +61,35 @@ export class BlockFS
     for await (const chunk of entry.content()) {
       yield chunk;
     }
+  }
+}
+
+
+// ===========================================================================
+export class RealIPFSStore
+{
+  constructor(ipfsreal) {
+    this.ipfs = ipfsreal;
+  }
+
+  addFile(data, opts) {
+    return this.ipfs.add(data, opts);
+  }
+
+  addAllFiles(datas, opts) {
+    return this.ipfs.addAll(datas, opts);
+  }
+
+  catFile(cid) {
+    return this.ipfs.cat(cid);
+  }
+
+  blockPut(data, opts) {
+    return this.ipfs.block.put(data, opts);
+  }
+
+  blockGet(cid) {
+    return this.ipfs.block.get(cid);
   }
 }
 

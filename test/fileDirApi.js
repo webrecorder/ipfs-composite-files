@@ -1,6 +1,10 @@
 import test from "ava";
 
 import fsp from "fs/promises";
+import fs from "fs";
+import path from "path";
+import os from "os";
+import AdmZip from "adm-zip";
 
 import * as utils from "./helpers/utils.js";
 
@@ -98,6 +102,25 @@ async function testZipDir(t, cid, expected) {
 
   t.is(cid.toString(), expected);
 }
+
+async function verifyZipEntries(t, cid, expected) {
+  const tempfilename = path.join(os.tmpdir(), "zip-test");
+  const tempfile = fs.createWriteStream(tempfilename);
+
+  for await (const chunk of ipfs.catFile(cid)) {
+    tempfile.write(chunk);
+  }
+  tempfile.close();
+
+  const zip = new AdmZip(tempfilename);
+  const zipEntries = zip.getEntries();
+
+  const names = zipEntries.map(entry => entry.entryName);
+  await fsp.unlink(tempfilename);
+
+  t.deepEqual(names, expected);
+}
+
 async function testCreateDir(t, files, expected) {
   const cid = await makeDir(ipfs, files);
 
@@ -277,6 +300,19 @@ test(
   testZipDir,
   "bafybeidsbx6l3axec76hgxpajcorcq2shb5hewasmyimohztpr6pybzrxm",
   "bafybeibendipv6yz5n6ozh6lxlrun4xshosz2lfxjzsue4pqyjq2tjank4"
+);
+
+test(
+  "verify zip contents",
+  verifyZipEntries,
+  "bafybeibendipv6yz5n6ozh6lxlrun4xshosz2lfxjzsue4pqyjq2tjank4",
+  [
+    'archive/iana.warc',
+    'datapackage-digest.json',
+    'datapackage.json',
+    'indexes/iana.cdxj',
+    'pages/pages.jsonl'
+  ]
 );
 
 test(
