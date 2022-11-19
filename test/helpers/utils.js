@@ -1,4 +1,18 @@
 import { MemoryStore } from "../../src/store.js";
+import {
+  ReadableStream
+} from 'node:stream/web';
+
+
+if (!global.ReadableStream) {
+  global.ReadableStream = ReadableStream;
+}
+
+class MockFile {};
+global.File = MockFile;
+
+class MockBlob {};
+global.Blob = MockBlob;
 
 let store;
 const encoder = new TextEncoder();

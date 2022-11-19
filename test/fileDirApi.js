@@ -106,17 +106,19 @@ async function testZipDir(t, cid, expected) {
 async function verifyZipEntries(t, cid, expected) {
   const tempfilename = path.join(os.tmpdir(), "zip-test");
   const tempfile = fs.createWriteStream(tempfilename);
+  const p = new Promise(resolve => tempfile.on("finish", resolve));
 
   for await (const chunk of ipfs.catFile(cid)) {
     tempfile.write(chunk);
   }
   tempfile.close();
+  await p;
 
   const zip = new AdmZip(tempfilename);
   const zipEntries = zip.getEntries();
 
   const names = zipEntries.map(entry => entry.entryName);
-  await fsp.unlink(tempfilename);
+  //await fsp.unlink(tempfilename);
 
   t.deepEqual(names, expected);
 }

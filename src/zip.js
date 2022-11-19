@@ -6,8 +6,6 @@ import { makeZip } from "client-zip/index.js";
 import { traverseDir } from "./traverse.js";
 import { concat } from "./concat.js";
 
-class MockFile {};
-global.File = MockFile;
 
 // ===========================================================================
 const encoder = new TextEncoder();
