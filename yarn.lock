@@ -1904,7 +1904,7 @@ cli-truncate@^3.1.0:
 
 "client-zip@github:ikreymer/client-zip":
   version "2.3.0"
-  resolved "https://codeload.github.com/ikreymer/client-zip/tar.gz/6908eeef3cf3c5ece2d6cd0b3c3713b3cd772b35"
+  resolved "https://codeload.github.com/ikreymer/client-zip/tar.gz/2f49ebf12b3092b80c57027fc7053a1cefb2ce08"
 
 cliui@^7.0.2:
   version "7.0.4"
