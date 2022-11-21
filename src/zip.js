@@ -1,28 +1,34 @@
 import { ReadableStream } from "node:stream/web";
 import { CID } from "multiformats/cid";
 
-import { loadFiles } from "client-zip/index.js";
+import { makeZip } from "client-zip/index.js";
 
 import { traverseDir } from "./traverse.js";
 import { concat } from "./concat.js";
+
 
 // ===========================================================================
 const encoder = new TextEncoder();
 
 // ===========================================================================
-async function* iterDirForZip(ipfs, cid) {
-  for await (const entry of traverseDir(ipfs, cid)) {
-    const file = {
-      bytes: {
-        iter: ipfs.cat(entry.cid),
-        id: entry.cid,
-      },
-      modDate: new Date(entry.mtime),
-      encodedName: encoder.encode(entry.name.slice(1)),
-      uncompressedSize: entry.size,
-    };
+async function* iterDirForZip(ipfs, cid, queue, marker) {
+  const timezoneOffset = new Date().getTimezoneOffset() * 60000;
 
-    yield file;
+  async function* addMarkers(iter) {
+    yield marker;
+    yield *iter;
+    yield marker;
+  }
+
+  for await (const entry of traverseDir(ipfs, cid)) {
+    const {cid, size, mtime} = entry;
+    const name = entry.name.slice(1);
+    const encodedName = encoder.encode(name);
+    const input = addMarkers(ipfs.catFile(cid));
+    const lastModified = new Date(mtime + timezoneOffset);
+
+    queue.push({name, encodedName, cid, size});
+    yield {input, lastModified, name, size};
   }
 }
 
@@ -35,23 +41,34 @@ export async function createZip(ipfs, cid) {
 
   const addBuffers = async () => {
     if (buff.length) {
-      const { cid } = await ipfs.add(buff);
+      const { cid } = await ipfs.addFile(buff);
       cids.push(cid);
       sizes[cid] = buff.reduce((sum, x) => sum + x.length, 0);
       buff = [];
     }
   };
 
-  for await (const entry of loadFiles(iterDirForZip(ipfs, cid))) {
-    if (entry instanceof Uint8Array) {
-      buff.push(entry);
-    } else {
-      await addBuffers();
-      if (typeof entry === "object" && entry.id instanceof CID) {
-        const { id, size } = entry;
-        cids.push(id);
-        sizes[id] = Number(size);
+  const queue = [];
+  const decoder = new TextDecoder();
+  const marker = new Uint8Array();
+
+  let isSkipping = false;
+
+  for await (const chunk of makeZip(iterDirForZip(ipfs, cid, queue, marker))) {
+    // if at marker, commit file chunk
+    // toggle isSkipping at each marker: don't skip outside file, skip file data
+    if (chunk === marker) {
+      // if any data written and file cid prepared
+      if (queue.length && buff.length) {
+        await addBuffers();
+        const { cid, size } = queue.shift();
+        // add already known cid from queue
+        cids.push(cid);
+        sizes[cid] = Number(size);
       }
+      isSkipping = !isSkipping;
+    } else if (!isSkipping) {
+      buff.push(chunk);
     }
   }
 

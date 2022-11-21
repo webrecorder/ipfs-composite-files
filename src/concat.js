@@ -1,17 +1,20 @@
 import { code as rawCode } from "multiformats/codecs/raw";
 import { UnixFS } from "ipfs-unixfs";
+import * as dagPb from "@ipld/dag-pb";
 
 // ===========================================================================
 export async function getSize(ipfs, cid, allowDir = false) {
-  const { value } = await ipfs.dag.get(cid);
+  const block = await ipfs.blockGet(cid);
 
-  // if raw, use length of value
+  // if raw, use length of block
   if (cid.code == rawCode) {
-    return value.length;
+    return block.length;
   }
 
+  const { Data } = dagPb.decode(block);
+
   // otherwise, parse to unixfs node
-  let unixfs = UnixFS.unmarshal(value.Data);
+  let unixfs = UnixFS.unmarshal(Data);
 
   if (!allowDir && unixfs.isDirectory()) {
     throw new Error(`cid ${cid} is a directory, only files allowed`);
@@ -51,7 +54,7 @@ export async function concat(ipfs, cids, sizes = {}) {
 
   const Data = node.marshal();
 
-  return await ipfs.dag.put({ Data, Links }, { storeCodec: "dag-pb" });
+  return await putBlock(ipfs, { Data, Links });
 }
 
 // ===========================================================================
@@ -82,7 +85,7 @@ export async function makeDir(ipfs, files) {
 
   const Links = await _createDirLinks(ipfs, files);
 
-  return await ipfs.dag.put({ Data, Links }, { storeCodec: "dag-pb" });
+  return await putBlock(ipfs, { Data, Links });
 }
 
 // ===========================================================================
@@ -91,8 +94,9 @@ export async function addToDir(ipfs, dirCid, files) {
     throw new Error("raw cid -- not a directory");
   }
 
-  const { value } = await ipfs.dag.get(dirCid);
-  let { Data, Links } = value;
+  const block = await ipfs.blockGet(dirCid);
+
+  let { Data, Links } = dagPb.decode(block);
 
   let node = UnixFS.unmarshal(Data);
 
@@ -107,5 +111,12 @@ export async function addToDir(ipfs, dirCid, files) {
   // todo: disallow duplicates
   Links.sort((a, b) => (a.Name < b.Name ? -1 : 1));
 
-  return await ipfs.dag.put({ Data, Links }, { storeCodec: "dag-pb" });
+  return await putBlock(ipfs, { Data, Links });
 }
+
+
+// ===========================================================================
+function putBlock(ipfs, node) {
+  return ipfs.blockPut(dagPb.encode(dagPb.prepare(node)), {version: 1, format: "dag-pb"});
+}
+
