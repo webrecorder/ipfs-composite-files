@@ -12,12 +12,14 @@ const encoder = new TextEncoder();
 
 // ===========================================================================
 async function* iterDirForZip(ipfs, cid, queue) {
+  const timezoneOffset = new Date().getTimezoneOffset() * 60000;
+
   for await (const entry of traverseDir(ipfs, cid)) {
     const {cid, size, mtime} = entry;
     const name = entry.name.slice(1);
     const encodedName = encoder.encode(name);
     const input = ipfs.catFile(cid);
-    const lastModified = new Date(mtime);
+    const lastModified = new Date(mtime + timezoneOffset);
 
     queue.push({name, encodedName, cid, size});
     yield {input, lastModified, name, size};
@@ -42,22 +44,26 @@ export async function createZip(ipfs, cid) {
 
   const queue = [];
   const decoder = new TextDecoder();
-  const opts = {utcDates: true, skipEmitFileData: true};
+  const marker = new Uint8Array();
+  const opts = {markerBeforeFileStart: marker, markerAfterFileEnd: marker};
 
-  let count = 0;
+  let isSkipping = false;
 
   for await (const chunk of makeZip(iterDirForZip(ipfs, cid, queue), opts)) {
-    buff.push(chunk);
-    count++;
-
-    // if this chunk is the name of the zip file entry, then flush the remainder to own CID, and split after this block
-    // to avoid false positives, must be at least 2 blocks in the buff list
-    if (count >= 2 && queue.length && queue[0].encodedName.length === chunk.length && decoder.decode(chunk) === queue[0].name) {
-      count = 0;
-      await addBuffers();
-      const { cid, size } = queue.shift();
-      cids.push(cid);
-      sizes[cid] = Number(size);
+    // if at marker, commit file chunk
+    // toggle isSkipping at each marker: don't skip outside file, skip file data
+    if (chunk === marker) {
+      // if any data written and file cid prepared
+      if (queue.length && buff.length) {
+        await addBuffers();
+        const { cid, size } = queue.shift();
+        // add already known cid from queue
+        cids.push(cid);
+        sizes[cid] = Number(size);
+      }
+      isSkipping = !isSkipping;
+    } else if (!isSkipping) {
+      buff.push(chunk);
     }
   }
 
