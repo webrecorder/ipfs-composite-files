@@ -5,6 +5,7 @@ import { hideBin } from "yargs/helpers";
 
 import { create as ipfsClientCreate } from "ipfs-http-client";
 import { create as ipfsCreate } from "ipfs-core";
+import { RealIPFSStore } from "./src/store.js";
 
 import { CID } from "multiformats/cid";
 
@@ -12,7 +13,7 @@ import { concat, makeDir, addToDir } from "./src/concat.js";
 
 import { splitAddWithSplitsFile } from "./cli-utils.js";
 
-import { traverse, traverseDir } from "./src/traverse.js";
+import { traverse, traverseDir, getStat } from "./src/traverse.js";
 
 import { createZip } from "./src/zip.js";
 
@@ -90,18 +91,29 @@ export function main() {
       runZipDir
     )
 
+    .command(
+      "stat <cidpath>",
+      "Get stats of a root CID or path string. Can be <cid> or <cid>/path/to/file",
+      () => {},
+      runStat
+    )
+
     .demandCommand(1).argv;
 }
 
 // ===========================================================================
 async function initIPFS(argv) {
+  let ipfs;
+
   if (argv.repo) {
-    return await ipfsCreate({ offline: true, repo: argv.repo });
+    ipfs = await ipfsCreate({ offline: true, repo: argv.repo });
   } else if (argv.api) {
-    return await ipfsClientCreate({ url: argv.api });
+    ipfs = await ipfsClientCreate({ url: argv.api });
   } else {
-    return await ipfsCreate({ offline: true });
+    ipfs = await ipfsCreate({ offline: true });
   }
+
+  return new RealIPFSStore(ipfs);
 }
 
 // ===========================================================================
@@ -188,7 +200,20 @@ async function runWalkDir(argv) {
   const cid = CID.parse(argv.cid);
 
   for await (const entry of traverseDir(ipfs, cid)) {
-    console.log(`${entry.cid.toV1()}: ${entry.name} - ${entry.size}`);
+    console.log(`${entry.cid.toV1()}: "${entry.name}" - ${entry.size}`);
+  }
+}
+
+// ===========================================================================
+async function runStat(argv) {
+  const ipfs = await initIPFS(argv);
+
+  const entry = await getStat(ipfs, argv.cidpath);
+
+  if (entry) {
+    console.log(`${entry.cid.toV1()}: "${entry.name}" - ${entry.size}`);
+  } else {
+    console.log("Not Found!");
   }
 }
 

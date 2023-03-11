@@ -1,22 +1,34 @@
-import * as IPFS from "ipfs-core";
+import { MemoryStore } from "../../src/store.js";
+import {
+  ReadableStream
+} from 'node:stream/web';
 
-import { createInMemoryRepo } from "../../src/inmemrepo.js";
 
-let ipfs;
+if (!global.ReadableStream) {
+  global.ReadableStream = ReadableStream;
+}
+
+class MockFile {};
+global.File = MockFile;
+
+class MockBlob {};
+global.Blob = MockBlob;
+
+let store;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
 export async function create() {
-  if (!ipfs) {
-    //ipfs = await IPFS.create({ repo, offline: true });
-    ipfs = await IPFS.create(await createInMemoryRepo());
+  if (!store) {
+    //store = new RealIPFS(await IPFS.create(await createInMemoryRepo()));
+    store = new MemoryStore();
   }
-  return ipfs;
+  return store;
 }
 
 export async function addString(text, opts = {}) {
-  const { cid } = await ipfs.add(text, opts);
-  //const { cid } = await ipfs.add([encoder.encode(text)], opts);
+  //const { cid } = await store.addFile(text, opts);
+  const { cid } = await store.addFile([encoder.encode(text)], opts);
   return cid;
 }
 
@@ -24,7 +36,7 @@ export async function getBuffer(cid) {
   const buffs = [];
   let totalLength = 0;
 
-  for await (const chunk of ipfs.cat(cid)) {
+  for await (const chunk of store.catFile(cid)) {
     buffs.push(chunk);
     totalLength += chunk.length;
   }

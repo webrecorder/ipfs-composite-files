@@ -1,17 +1,22 @@
 import test from "ava";
 
 import fsp from "fs/promises";
+import fs from "fs";
+import path from "path";
+import os from "os";
+import AdmZip from "adm-zip";
 
 import * as utils from "./helpers/utils.js";
 
 import { CID } from "multiformats/cid";
 import { makeDir, addToDir } from "../src/concat.js";
-import { traverse, traverseDir } from "../src/traverse.js";
+import { traverse, traverseDir, getStat } from "../src/traverse.js";
 import { splitAddWithSplitsFile } from "../cli-utils.js";
 import { parseSplits } from "../src/split-add.js";
 import { createZip } from "../src/zip.js";
 
 let ipfs;
+
 
 // ===========================================================================
 
@@ -33,8 +38,8 @@ async function addFileSplit(t, contentFilename, splitsFilename, expected) {
 }
 
 async function addFile(t, filename, opts, expected) {
-  const { cid } = await ipfs.add(
-    await fsp.readFile(utils.dataDir + filename),
+  const { cid } = await ipfs.addFile(
+    [await fsp.readFile(utils.dataDir + filename)],
     opts
   );
 
@@ -81,9 +86,10 @@ async function addDir(t, dirPath, expected) {
 
   let cid;
 
-  for await (const entry of ipfs.addAll(files, {
+  for await (const entry of ipfs.addAllFiles(files, {
     wrapWithDirectory: true,
     cidVersion: 1,
+    rawLeaves: true,
   })) {
     cid = entry.cid;
   }
@@ -96,6 +102,27 @@ async function testZipDir(t, cid, expected) {
 
   t.is(cid.toString(), expected);
 }
+
+async function verifyZipEntries(t, cid, expected) {
+  const tempfilename = path.join(os.tmpdir(), "zip-test");
+  const tempfile = fs.createWriteStream(tempfilename);
+  const p = new Promise(resolve => tempfile.on("finish", resolve));
+
+  for await (const chunk of ipfs.catFile(cid)) {
+    tempfile.write(chunk);
+  }
+  tempfile.close();
+  await p;
+
+  const zip = new AdmZip(tempfilename);
+  const zipEntries = zip.getEntries();
+
+  const names = zipEntries.map(entry => entry.entryName);
+  //await fsp.unlink(tempfilename);
+
+  t.deepEqual(names, expected);
+}
+
 async function testCreateDir(t, files, expected) {
   const cid = await makeDir(ipfs, files);
 
@@ -108,6 +135,13 @@ async function testAddToDir(t, cid, files, expected) {
   cid = await addToDir(ipfs, cid, files);
 
   t.is(cid.toString(), expected);
+}
+
+async function testFileSize(t, cidpath, expected) {
+  const entry = await getStat(ipfs, cidpath);
+  const size = entry && entry.size;
+
+  t.is(size, expected);
 }
 
 async function testVerifyRanges(t, cid, ranges) {
@@ -136,7 +170,7 @@ test(
   "add cdx",
   addFile,
   "iana.cdxj",
-  { cidVersion: 1 },
+  {cidVersion: 1, rawLeaves: true},
   "bafkreibgqhyupecf3om6wrya5hp6gflzey345qrb5nl2zcipx5ru5smiey"
 );
 
@@ -249,10 +283,38 @@ test(
 );
 
 test(
+  "size file in dir",
+  testFileSize,
+  "bafybeidsbx6l3axec76hgxpajcorcq2shb5hewasmyimohztpr6pybzrxm/archive/iana.warc",
+  552683
+);
+
+test(
+  "size file direct",
+  testFileSize,
+  "bafybeihqptzlm43udmr2riplqtgxa4brx2thqnl7hpjsfn3rtgtjfrowya",
+  552683
+);
+
+
+test(
   "zip",
   testZipDir,
   "bafybeidsbx6l3axec76hgxpajcorcq2shb5hewasmyimohztpr6pybzrxm",
   "bafybeibendipv6yz5n6ozh6lxlrun4xshosz2lfxjzsue4pqyjq2tjank4"
+);
+
+test(
+  "verify zip contents",
+  verifyZipEntries,
+  "bafybeibendipv6yz5n6ozh6lxlrun4xshosz2lfxjzsue4pqyjq2tjank4",
+  [
+    'archive/iana.warc',
+    'datapackage-digest.json',
+    'datapackage.json',
+    'indexes/iana.cdxj',
+    'pages/pages.jsonl'
+  ]
 );
 
 test(

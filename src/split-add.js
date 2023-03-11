@@ -32,7 +32,7 @@ export async function splitAdd(
   let offset = 0;
 
   for await (const segs of iterSegments(fh, offsets, 1024 * 256)) {
-    const { cid, size } = await ipfs.add(segs, opts);
+    const { cid, size } = await ipfs.addFile(segs, opts);
     cids.push(cid);
 
     const length = offsets[i] - offset;
