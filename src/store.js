@@ -1,6 +1,7 @@
 import { MemoryBlockstore } from "blockstore-core";
 
 import { importer } from 'ipfs-unixfs-importer';
+import { fixedSize } from 'ipfs-unixfs-importer/chunker';
 import { exporter } from 'ipfs-unixfs-exporter';
 
 import { CID } from 'multiformats/cid';
@@ -21,7 +22,8 @@ export class MemoryStore
     const source = [{content: iter}];
 
     if (opts.chunker) {
-      opts = {...opts, maxChunkSize: Number(opts.chunker.split("-")[1]), chunker: "fixed"};
+      const chunkSize = Number(opts.chunker.split("-")[1]);
+      opts = {...opts, chunker: fixedSize({ chunkSize })};
     }
 
     for await (const entry of importer(source, this.store, opts)) {
@@ -36,7 +38,8 @@ export class MemoryStore
     const source = iter;
 
     if (opts.chunker) {
-      opts = {...opts, maxChunkSize: Number(opts.chunker.split("-")[1]), chunker: "fixed"};
+      const chunkSize = Number(opts.chunker.split("-")[1]);
+      opts = {...opts, chunker: fixedSize({ chunkSize })};
     }
 
     for await (const entry of importer(source, this.store, opts)) {
