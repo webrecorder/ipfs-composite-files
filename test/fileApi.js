@@ -93,7 +93,7 @@ async function addFile(
   const actual = await utils.getBuffer(cid);
 
   t.is(actual.length, expected.length);
-  //t.deepEqual(actual, expected);
+  t.deepEqual(actual, expected);
 }
 
 // ===========================================================================
