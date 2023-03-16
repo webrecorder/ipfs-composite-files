@@ -298,7 +298,7 @@ test(
 );
 
 
-const ZIP_ROOT_CID = "bafybeie7quzvifzamtwetvhdke5jgqnmieivupemwqhf7ukjlt2fnfoyyy";
+const ZIP_ROOT_CID = "bafybeieft4ovacwlaxuvnouy4ylpy63yrxsqdmwliehdlwaofn32mvdesy";
 
 
 
@@ -330,16 +330,16 @@ test(
   // prettier-ignore
   [
     // Zip Block Comprised of existing directory blocks
-    ["bafkreidhuvwqi3msg6vqvvzjtagk57fteoqnsk4demltwtclusdrhe762q", 47],
+    ["bafkreifobtw4nfyafnccek63fgif5ofbkxmf77pkvinnni4zxslfsijyqa", 47],
     ["bafybeihqptzlm43udmr2riplqtgxa4brx2thqnl7hpjsfn3rtgtjfrowya", 552683], // archive/iana.warc
-    ["bafkreidkhwhmpo2abs3idm6alombzrcbbugahw7ccyf6u7we7b6ii6c7iu", 69],
+    ["bafkreihjhja6j4237gfm6b5ivv5vlwgrxrtexs3n76fkve4zgv7aggke54", 69],
     ["bafkreiftimfhuhoqkjjsoa62szrjkeu57f5qbbruj2t5ilxv3azds3jjmi", 675],    // datapackage-digest.json
-    ["bafkreiddz6fjnxwuhoiihli45hp6mkjdvmceabslogu7cnkouyuaidkwcy", 62],
+    ["bafkreifbm54w2kb5n7y25xm7acu4o3yybnifq4i4fgrdhzqeqm6u5mhf4i", 62],
     ["bafkreigy4p4k56qj3vg5nczznv4x7kmfygete37qg2vbmkrj2cfezco4cm", 817],    // datapackage.json
-    ["bafkreihi6qvnbwkiddx6apt72snmsw26phrzpiqlm4gwnruulzohwe4qhu", 63],
+    ["bafkreicczrjq6ew76e5q625uekm7przzfxf5rn7ai2lw3mcntsbeo2xqd4", 63],
     ["bafkreibgqhyupecf3om6wrya5hp6gflzey345qrb5nl2zcipx5ru5smiey", 5866],   // indexes/iana.cdxj
-    ["bafkreieih3hnnbgkdb2s6ttjjoosnaidf27fydolwfssishizmgkjzzioi", 63],
+    ["bafkreibhvpuyvbbbs5f6hsjbbx2rauoqxgfxj33pn4vqpkf636fe3spiem", 63],
     ["bafkreifragagtvk3w6dplny5pfjeurkeyvqccf5amlw7huzj4ndiu3g6yi", 1746],   // pages/pages.jsonl
-    ["bafkreidpsonqxeputkxrdxhhry2x72nuzdaqefrri6j2mhjdk53hus2wmi", 358],
+    ["bafkreihc7yehmzq7bqhfi6r6jjbli6lyxekdlyzyrypob6jjkpkrmig5yi", 358],
   ]
 );

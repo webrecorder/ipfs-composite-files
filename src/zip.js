@@ -12,7 +12,10 @@ const encoder = new TextEncoder();
 
 // ===========================================================================
 async function* iterDirForZip(ipfs, cid, queue, marker) {
-  const timezoneOffset = new Date().getTimezoneOffset() * 60000;
+  // correctly handles DST
+  const hoursOffset = 24 - new Date(0).getHours();
+  const timezoneOffset = hoursOffset * 60 * 60 * 1000;
+  //const timezoneOffset = new Date().getTimezoneOffset() * 60000;
 
   async function* addMarkers(iter) {
     yield marker;
