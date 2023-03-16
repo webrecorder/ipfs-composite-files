@@ -31,7 +31,8 @@ async function addFileSplit(t, contentFilename, splitsFilename, expected) {
   const { cid, size } = await splitAddWithSplitsFile(
     ipfs,
     contentFilename,
-    splitsFilename
+    splitsFilename,
+    {rawLeaves: false, cidVersion: 0}
   );
 
   t.is(cid.toString(), expected);
@@ -297,17 +298,21 @@ test(
 );
 
 
+const ZIP_ROOT_CID = "bafybeieft4ovacwlaxuvnouy4ylpy63yrxsqdmwliehdlwaofn32mvdesy";
+
+
+
 test(
   "zip",
   testZipDir,
   "bafybeidsbx6l3axec76hgxpajcorcq2shb5hewasmyimohztpr6pybzrxm",
-  "bafybeibendipv6yz5n6ozh6lxlrun4xshosz2lfxjzsue4pqyjq2tjank4"
+  ZIP_ROOT_CID
 );
 
 test(
   "verify zip contents",
   verifyZipEntries,
-  "bafybeibendipv6yz5n6ozh6lxlrun4xshosz2lfxjzsue4pqyjq2tjank4",
+  ZIP_ROOT_CID,
   [
     'archive/iana.warc',
     'datapackage-digest.json',
@@ -320,21 +325,21 @@ test(
 test(
   "verify zip blocks",
   testVerifyRanges,
-  "bafybeibendipv6yz5n6ozh6lxlrun4xshosz2lfxjzsue4pqyjq2tjank4",
+  ZIP_ROOT_CID,
 
   // prettier-ignore
   [
     // Zip Block Comprised of existing directory blocks
-    ["QmdEkWCJdUbvvDPx64K9FvLL1CUBWhou2Y6pcbW1D41jAw", 47],
+    ["bafkreifobtw4nfyafnccek63fgif5ofbkxmf77pkvinnni4zxslfsijyqa", 47],
     ["bafybeihqptzlm43udmr2riplqtgxa4brx2thqnl7hpjsfn3rtgtjfrowya", 552683], // archive/iana.warc
-    ["QmTBTjoxoV7CbPwJvxNRs7qLgR7yfzdRkEgBDxQCtzTs7A", 69],
+    ["bafkreihjhja6j4237gfm6b5ivv5vlwgrxrtexs3n76fkve4zgv7aggke54", 69],
     ["bafkreiftimfhuhoqkjjsoa62szrjkeu57f5qbbruj2t5ilxv3azds3jjmi", 675],    // datapackage-digest.json
-    ["QmY6MrCAnhkWDu4eM2MLFecV35ybe916QEDXK3NpnpCzqJ", 62],
+    ["bafkreifbm54w2kb5n7y25xm7acu4o3yybnifq4i4fgrdhzqeqm6u5mhf4i", 62],
     ["bafkreigy4p4k56qj3vg5nczznv4x7kmfygete37qg2vbmkrj2cfezco4cm", 817],    // datapackage.json
-    ["QmfDgn3GRQ6xy14X8Zw9CpURV25jBYp79NFZJTrRYQBGZ1", 63],
+    ["bafkreicczrjq6ew76e5q625uekm7przzfxf5rn7ai2lw3mcntsbeo2xqd4", 63],
     ["bafkreibgqhyupecf3om6wrya5hp6gflzey345qrb5nl2zcipx5ru5smiey", 5866],   // indexes/iana.cdxj
-    ["QmNUe14jLedWdcQ2chSuY79DFCNa7ujtzsAEXRqVvyJ1Za", 63],
+    ["bafkreibhvpuyvbbbs5f6hsjbbx2rauoqxgfxj33pn4vqpkf636fe3spiem", 63],
     ["bafkreifragagtvk3w6dplny5pfjeurkeyvqccf5amlw7huzj4ndiu3g6yi", 1746],   // pages/pages.jsonl
-    ["QmUGb1y2BmLVo37SbxSR2M28bqq69tDn625xiumFqQMMWh", 358],
+    ["bafkreihc7yehmzq7bqhfi6r6jjbli6lyxekdlyzyrypob6jjkpkrmig5yi", 358],
   ]
 );

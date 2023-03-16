@@ -1,6 +1,6 @@
 {
   "name": "ipfs-composite-files",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "main": "index.js",
   "type": "module",
   "license": "MIT",
@@ -18,14 +18,14 @@
     "build-dev": "webpack --mode development"
   },
   "dependencies": {
-    "@ipld/dag-pb": "^3.0.0",
-    "blockstore-core": "^2.0.2",
+    "@ipld/dag-pb": "^4.0.2",
+    "blockstore-core": "^4.0.1",
     "client-zip": "github:ikreymer/client-zip",
-    "ipfs-unixfs": "^8.0.0",
-    "ipfs-unixfs-exporter": "8.0.5",
-    "ipfs-unixfs-importer": "^11.0.1",
-    "multiformats": "^10.0.2",
-    "yargs": "^17.5.1"
+    "ipfs-unixfs": "^11.0.0",
+    "ipfs-unixfs-exporter": "^13.0.6",
+    "ipfs-unixfs-importer": "^15.0.3",
+    "multiformats": "^11.0.2",
+    "yargs": "^17.7.1"
   },
   "eslintConfig": {
     "env": {

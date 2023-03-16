@@ -11,7 +11,7 @@ export async function* traverse(
   cid,
   depth = Number.POSITIVE_INFINITY,
   offset = 0,
-  length = 0
+  length = 0,
 ) {
   const block = await ipfs.blockGet(cid);
 
@@ -33,19 +33,21 @@ export async function* traverse(
   if (!unixfs.data && unixfs.blockSizes.length) {
     if (depth > 0) {
       for (let i = 0; i < unixfs.blockSizes.length; i++) {
+        const blockSize = Number(unixfs.blockSizes[i]);
         yield* traverse(
           ipfs,
           Links[i].Hash,
           depth - 1,
           offset,
-          unixfs.blockSizes[i]
+          blockSize
         );
 
-        offset += unixfs.blockSizes[i];
+        offset += blockSize;
       }
     } else {
-      yield { cid, offset, length: unixfs.fileSize(), type: "unixfs" };
-      offset += unixfs.fileSize();
+      const fileSize = Number(unixfs.fileSize());
+      yield { cid, offset, length: fileSize, type: "unixfs" };
+      offset += fileSize;
     }
 
     if (length && length != offset - initialOffset) {
@@ -76,7 +78,7 @@ export async function* traverseDir(ipfs, cid, name = "", includeDir = false) {
   if (!unixfs.isDirectory()) {
     yield {
       cid,
-      size: unixfs.fileSize(),
+      size: Number(unixfs.fileSize()),
       name,
       mtime: unixfs.mtime || 0,
       dir: false,

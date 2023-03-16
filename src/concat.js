@@ -45,12 +45,12 @@ export async function concat(ipfs, cids, sizes = {}) {
       return {
         Name: "",
         Hash: cid,
-        Tsize,
+        Tsize: Number(Tsize)
       };
     })
   );
 
-  Links.map(({ Tsize }) => node.addBlockSize(Tsize));
+  Links.map(({ Tsize }) => node.addBlockSize(BigInt(Tsize)));
 
   const Data = node.marshal();
 
@@ -71,7 +71,7 @@ async function _createDirLinks(ipfs, files) {
       return {
         Name,
         Hash: cid,
-        Tsize,
+        Tsize: Number(Tsize)
       };
     })
   );
