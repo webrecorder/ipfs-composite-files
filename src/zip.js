@@ -1,7 +1,7 @@
 import { ReadableStream } from "node:stream/web";
 import { CID } from "multiformats/cid";
 
-import { makeZip } from "client-zip/index.js";
+import { makeZip } from "client-zip";
 
 import { traverseDir } from "./traverse.js";
 import { concat } from "./concat.js";
